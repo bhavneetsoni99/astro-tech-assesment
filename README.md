@@ -279,3 +279,7 @@ Don't worry about:
 ## Questions or Issues
 
 If you encounter any setup issues or have questions about the requirements, please include them in your submission documentation.
+
+### Initial Setup Pain Points
+
+Ran into trouble while inital setup of the proeject, `pandas` installatio was failing due to mismatch of the pre-compiled wheels for the Python version (3.14.6) and pandas version specified in the Requirements.txt, had to upgrade the pandas version to latest one (3.0.3) to resolve.
