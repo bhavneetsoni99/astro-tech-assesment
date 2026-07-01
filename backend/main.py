@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import select
 import os
 import pandas as pd
 from typing import List, Optional
@@ -106,11 +107,25 @@ def get_players():
     """
     Get all players or filter by team/position.
     """
-    # TODO: Implement player retrieval with optional filtering
-    # Below is a simple example returning a subset of players
-    pitches = Player.query.limit(1000).all()
+    team_arg = request.args.get("team")
+    position_arg = request.args.get("position")
+
+    selectPlayers = select(Player)
+
+    if team_arg:
+        normalized_team_name = team_arg.strip().lower()
+        if normalized_team_name != 'all':
+            selectPlayers = selectPlayers.where(Player.team.ilike(normalized_team_name))
+
+    if position_arg:
+        normalized_position = position_arg.strip().lower()
+        if normalized_position != 'all':
+            selectPlayers = selectPlayers.where(Player.primary_position.ilike(normalized_position))
+
+    players = db.session.execute(selectPlayers).scalars().all()
+
     schema = PlayerSchema(many=True)
-    result = schema.dump(pitches)
+    result = schema.dump(players)
     return jsonify(result), 200
 
 @app.route("/pitches", methods=["GET"])

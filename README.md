@@ -283,3 +283,25 @@ If you encounter any setup issues or have questions about the requirements, plea
 ### Initial Setup Pain Points
 
 Ran into trouble while inital setup of the proeject, `pandas` installatio was failing due to mismatch of the pre-compiled wheels for the Python version (3.14.6) and pandas version specified in the Requirements.txt, had to upgrade the pandas version to latest one (3.0.3) to resolve.
+
+Since we do not have any designs avaiable, I have tried to emulate [ESPNs Player table](https://www.espn.com/mlb/team/roster/_/name/bal/baltimore-orioles) design and style.
+
+### WIP
+
+1.  Starting with the BE I Implemented API to return `Players List` with filtering based on `Team` and/or `Position` in `main.py`.
+
+### Code Organization
+
+I have tried to colocate test and style files within the component folders. All components live in Component Directories under `src/components/`, utility functions in `src/utils/`
+
+### Testing Approach
+
+Tests were written alongside feature implementation, following the existing Vitest + React Testing Library pattern in the Frontend project and Backend project. I used the product requirements to define minimal viable product test cases and expand from there. Continuing to add unit as I build helps me stay on track and ensures new changes don’t break existing functionality. I believe its more important to test for edge cases than Happy paths. If time permits I will try to add E2E tests lateer on.
+
+#### Unit Tests Added:
+
+1.  Updated Unit tests and added unit test for `healthcheck` and `players` api end points.
+
+#### E2E Tests Added:
+
+### Additional Improvements
