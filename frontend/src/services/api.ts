@@ -16,7 +16,9 @@ export class ApiService {
    */
   static async getPlayers(filters?: PlayerFilterOptions): Promise<Player[]> {
     // TODO: Implement player retrieval with optional filtering
-    throw new Error("getPlayers not implemented");
+    const response = await api.get("/players", { params: filters });
+    const players: Player[] = response.data;
+    return players;
   }
 
   // TODO: add additional endpoint calls as needed.

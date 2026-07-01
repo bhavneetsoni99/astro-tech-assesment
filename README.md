@@ -288,7 +288,8 @@ Since we do not have any designs avaiable, I have tried to emulate [ESPNs Player
 
 ### WIP
 
-1.  Starting with the BE I Implemented API to return `Players List` with filtering based on `Team` and/or `Position` in `main.py`.
+1. Starting with the BE I Implemented API to return `Players List` with filtering based on `Team` and/or `Position` in `main.py`.
+2. Integrated BE `Player List` Api with FE api service call.
 
 ### Code Organization
 
@@ -301,6 +302,7 @@ Tests were written alongside feature implementation, following the existing Vite
 #### Unit Tests Added:
 
 1.  Updated Unit tests and added unit test for `healthcheck` and `players` api end points.
+2.  Added unit test for FE api service to test appropriate params are being passed to the BE end points.
 
 #### E2E Tests Added:
 
