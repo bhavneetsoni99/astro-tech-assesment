@@ -1,13 +1,10 @@
 import React, { useState } from "react";
 import "./App.css";
-import { Player, PlayerFilterOptions } from "./types";
-import PlayerFilterControls from "./components/PlayerFilterControls";
-import PlayerTable from "./components/PlayerTable";
+import { PlayerFilterOptions } from "./types";
+import PlayerFilterControls from "./components/PlayerFilterControls/PlayerFilterControls";
+import { PlayerTableWrapper } from "./components/PlayerTable";
 
 const App: React.FC = () => {
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string>("");
   const [availableTeams, setAvailableTeams] = useState<string[]>([]);
   const [availablePositions, setAvailablePositions] = useState<string[]>([]);
 
@@ -32,7 +29,7 @@ const App: React.FC = () => {
 
         {/* TODO: Player data table */}
         <section className="data-section">
-          <PlayerTable players={players} isLoading={isLoading} error={error} />
+          <PlayerTableWrapper filters={{}} />
         </section>
 
         {/* TODO: Pitch Filter Controls}
