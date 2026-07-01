@@ -121,12 +121,32 @@ def get_players():
         normalized_position = position_arg.strip().lower()
         if normalized_position != 'all':
             selectPlayers = selectPlayers.where(Player.primary_position.ilike(normalized_position))
-
+    #  TODO: Housekeeping - Add pagination support to the players endpoint to limit the number of results returned per request. (page number and page size)
+    #  TODO: Housekeeping - Add sorting support to the players endpoint to allow clients to sort the results by different fields (e.g., last name, team, position).
+    #  TODO: Housekeeping - Add filtering support for more parameters 
+   
     players = db.session.execute(selectPlayers).scalars().all()
 
     schema = PlayerSchema(many=True)
     result = schema.dump(players)
     return jsonify(result), 200
+
+@app.route("/players/<int:player_id>", methods=["GET"])
+def get_player(player_id):
+    """Get a single player by ID."""
+    select_player = select(Player).where(Player.player_id == player_id)
+    player = db.session.scalar(select_player)
+    if player is None:
+        return jsonify({"error": "Player not found"}), 404
+    schema = PlayerSchema()
+    return jsonify(schema.dump(player)), 200
+
+
+@app.route("/teams", methods=["GET"])
+def get_teams():
+    select_teams = select(Player.team).distinct().order_by(Player.team.asc())
+    teams = db.session.execute(select_teams).scalars().all()
+    return jsonify(teams), 200
 
 @app.route("/pitches", methods=["GET"])
 def get_pitches():

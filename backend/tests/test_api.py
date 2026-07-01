@@ -123,12 +123,29 @@ class TestPlayerAPI:
         data = response.get_json()
         assert data == []
 
-    def test_get_player_by_id(self, client):
+def test_get_player_by_id(self, client):
         """Test getting a specific player by ID."""
-        # TODO: Implement test for single player retrieval
-        pass
+        response = client.get("/players/453286")
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data["first_name"] == "Maxwell"
+        assert data["last_name"] == "Scherzer"
+        assert data["team"] == "TOR"
 
     def test_get_nonexistent_player(self, client):
         """Test getting a player that doesn't exist."""
-        # TODO: Implement test for 404 response
-        pass
+        response = client.get("/players/1")
+        assert response.status_code == 404
+        data = response.get_json()
+        assert "error" in data
+
+
+class TestTeamsAPI:
+    """Test teams-related API endpoints."""
+
+    def test_get_teams(self, client):
+        """Test getting all distinct teams sorted alphabetically."""
+        response = client.get("/teams")
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data == ["LAD", "SD", "TOR"]
