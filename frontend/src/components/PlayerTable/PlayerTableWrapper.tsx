@@ -14,14 +14,16 @@ export const PlayerTableWrapper: React.FC<PlayerTableWrapperProps> = ({
   const [players, setPlayers] = useState<Player[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
+  const {team, position} = filters;
 
   useEffect(() => {
     setIsLoading(true);
-    ApiService.getPlayers(filters)
+    setError("");
+    ApiService.getPlayers({team, position})
       .then(setPlayers)
       .catch((err) => setError(err.message))
       .finally(() => setIsLoading(false));
-  }, [filters]);
+  }, [team, position]);
 
   return (
     <PlayerTable players={players} isLoading={isLoading} error={error} />
