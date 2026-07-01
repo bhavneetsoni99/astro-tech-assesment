@@ -123,7 +123,7 @@ class TestPlayerAPI:
         data = response.get_json()
         assert data == []
 
-def test_get_player_by_id(self, client):
+    def test_get_player_by_id(self, client):
         """Test getting a specific player by ID."""
         response = client.get("/players/453286")
         assert response.status_code == 200
@@ -149,3 +149,13 @@ class TestTeamsAPI:
         assert response.status_code == 200
         data = response.get_json()
         assert data == ["LAD", "SD", "TOR"]
+
+class TestPositionsAPI:
+    """Test positions-related API endpoints."""
+
+    def test_get_positions(self, client):
+        """Test getting all distinct positions sorted alphabetically."""
+        response = client.get("/positions")
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data == ["LHS", "RHS"]

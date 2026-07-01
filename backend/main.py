@@ -114,13 +114,11 @@ def get_players():
 
     if team_arg:
         normalized_team_name = team_arg.strip().lower()
-        if normalized_team_name != 'all':
-            selectPlayers = selectPlayers.where(Player.team.ilike(normalized_team_name))
+        selectPlayers = selectPlayers.where(Player.team.ilike(normalized_team_name))
 
     if position_arg:
         normalized_position = position_arg.strip().lower()
-        if normalized_position != 'all':
-            selectPlayers = selectPlayers.where(Player.primary_position.ilike(normalized_position))
+        selectPlayers = selectPlayers.where(Player.primary_position.ilike(normalized_position))
     #  TODO: Housekeeping - Add pagination support to the players endpoint to limit the number of results returned per request. (page number and page size)
     #  TODO: Housekeeping - Add sorting support to the players endpoint to allow clients to sort the results by different fields (e.g., last name, team, position).
     #  TODO: Housekeeping - Add filtering support for more parameters 
@@ -148,6 +146,12 @@ def get_teams():
     teams = db.session.execute(select_teams).scalars().all()
     return jsonify(teams), 200
 
+@app.route("/positions", methods=["GET"])
+def get_positions():
+    select_positions = select(Player.primary_position).distinct().order_by(Player.primary_position.asc())
+    positions = db.session.execute(select_positions).scalars().all()
+    return jsonify(positions), 200
+
 @app.route("/pitches", methods=["GET"])
 def get_pitches():
     """
@@ -160,3 +164,4 @@ def get_pitches():
     result = schema.dump(pitches)
 
     return jsonify(result), 200
+

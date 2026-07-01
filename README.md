@@ -292,6 +292,7 @@ Since we do not have any designs avaiable, I have tried to emulate [ESPNs Player
 2. Integrated BE `Player List` Api with FE api service call.
 3. Implemented Players Table, Table component has been wrapped into a wrapper component to seperate concerns with Data fetching and business logic
 4. Implemented `player/:id` lookup and `teams` list apis
+5. Implemented `position` list api
 
 ### Code Organization
 
@@ -307,6 +308,7 @@ Tests were written alongside feature implementation, following the existing Vite
 2.  Added unit test for FE api service to test appropriate params are being passed to the BE end points.
 3.  Added unit test for `PlayerTable` component
 4.  Added `player/:id` lookup and `teams` list unit tests
+5.  Added `position` list unit test
 
 #### E2E Tests Added:
 
