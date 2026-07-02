@@ -1,6 +1,14 @@
-/* TODO: Add your CSS styles here */
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
 
 .App {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
   text-align: center;
   max-width: 1200px;
   margin: 0 auto;
@@ -26,26 +34,16 @@
 }
 
 .filter-section {
-}
-
-.filter-controls {
-}
-
-.filter-row {
-}
-
-.filter-group {
-}
-
-.filter-group label {
-}
-
-.filter-group select {
+  display: flex;
+  justify-content: space-between; 
 }
 
 .data-section {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 1rem;
 }
 
 
 
-/* TODO: Add any additional styling for better UX */

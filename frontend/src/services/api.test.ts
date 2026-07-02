@@ -43,4 +43,40 @@ describe("ApiService", () => {
       });
     });
   });
+
+  describe("getTeams", () => {
+    test("calls GET /teams and returns team names", async () => {
+      const teams = ["TOR", "SD", "LAD"];
+      mockGet.mockResolvedValue({ data: teams });
+
+      const result = await ApiService.getTeams();
+
+      expect(mockGet).toHaveBeenCalledWith("/teams");
+      expect(result).toEqual(teams);
+    });
+  });
+
+  describe("getPositions", () => {
+    test("calls GET /positions and returns position names", async () => {
+      const positions = ["1B", "2B", "LAD"];
+      mockGet.mockResolvedValue({ data: positions });
+
+      const result = await ApiService.getPositions();
+
+      expect(mockGet).toHaveBeenCalledWith("/positions");
+      expect(result).toEqual(positions);
+    });
+  });
+
+  describe("healthCheck", () => {
+    test("calls GET /health and returns status", async () => {
+      const health = { status: "healthy" };
+      mockGet.mockResolvedValue({ data: health, status: 200 });
+
+      const result = await ApiService.healthCheck();
+
+      expect(mockGet).toHaveBeenCalledWith("/health");
+      expect(result.data).toEqual(health);
+    });
+  });
 });

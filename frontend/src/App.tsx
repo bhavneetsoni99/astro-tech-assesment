@@ -1,14 +1,11 @@
 import React, { useState } from "react";
 import "./App.css";
 import { PlayerFilterOptions } from "./types";
-import PlayerFilterControls from "./components/PlayerFilterControls/PlayerFilterControls";
+import { PlayerFilterWrapper } from "./components/PlayerFilterControls";
 import { PlayerTableWrapper } from "./components/PlayerTable";
 
 const App: React.FC = () => {
-  const [availableTeams, setAvailableTeams] = useState<string[]>([]);
-  const [availablePositions, setAvailablePositions] = useState<string[]>([]);
-
-  const handleFilterChange = (filters: PlayerFilterOptions) => {};
+  const [filters, setFilters] = useState<PlayerFilterOptions>({});
 
   return (
     <div className="App">
@@ -18,18 +15,15 @@ const App: React.FC = () => {
       </header>
 
       <main>
-        {/* TODO: Player Filter controls */}
         <section className="filter-section">
-          <PlayerFilterControls
-            onFilterChange={handleFilterChange}
-            availableTeams={availableTeams}
-            availablePositions={availablePositions}
+          <PlayerFilterWrapper
+            onFilterChange={setFilters}
+            filters={filters}
           />
         </section>
 
-        {/* TODO: Player data table */}
         <section className="data-section">
-          <PlayerTableWrapper filters={{}} />
+          <PlayerTableWrapper filters={filters} />
         </section>
 
         {/* TODO: Pitch Filter Controls}

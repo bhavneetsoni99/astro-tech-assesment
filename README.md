@@ -290,9 +290,11 @@ Since we do not have any designs avaiable, I have tried to emulate [ESPNs Player
 
 1. Starting with the BE I Implemented API to return `Players List` with filtering based on `Team` and/or `Position` in `main.py`.
 2. Integrated BE `Player List` Api with FE api service call.
-3. Implemented Players Table, Table component has been wrapped into a wrapper component to seperate concerns with Data fetching and business logic
+3. Implemented `Players Table`, Table component has been wrapped into a wrapper component to seperate concerns with Data fetching and business logic
 4. Implemented `player/:id` lookup and `teams` list apis
-5. Implemented `position` list api
+5. Implemented `position` list api to fetch all possible position values from DB
+6. Implemented `teams` list api to fetch all possible team values from DB
+7. Implemented `PlayerFilters` component and functionality, playerFilter wrapped into a wrapper component to seperate concerns for Data fetching and business logic
 
 ### Code Organization
 
@@ -309,6 +311,8 @@ Tests were written alongside feature implementation, following the existing Vite
 3.  Added unit test for `PlayerTable` component
 4.  Added `player/:id` lookup and `teams` list unit tests
 5.  Added `position` list unit test
+6.  Added `position` list unit test
+7.  Add unit tests for player filter component
 
 #### E2E Tests Added:
 

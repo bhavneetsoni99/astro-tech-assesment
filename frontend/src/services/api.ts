@@ -15,10 +15,21 @@ export class ApiService {
    * Get all players or filter by team/position
    */
   static async getPlayers(filters?: PlayerFilterOptions): Promise<Player[]> {
-    // TODO: Implement player retrieval with optional filtering
     const response = await api.get("/players", { params: filters });
     const players: Player[] = response.data;
     return players;
+  }
+
+  static async getTeams(): Promise<string[]> {
+    const response = await api.get("/teams");
+    const teamNames: string[] = response.data;
+    return teamNames;
+  }
+
+  static async getPositions(): Promise<string[]> {
+    const response = await api.get("/positions");
+    const positionNames: string[] = response.data;
+    return positionNames;
   }
 
   // TODO: add additional endpoint calls as needed.
