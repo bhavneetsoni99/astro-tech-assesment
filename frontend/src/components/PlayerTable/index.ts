@@ -1,1 +1,1 @@
-export * from "./PlayerTableWrapper";
+export * from "./PlayerTable";

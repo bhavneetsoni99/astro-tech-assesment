@@ -1,98 +1,60 @@
-import React from "react";
-import { Player } from "../../types";
+import React, {useEffect, useMemo, useState} from "react";
+import ApiService from "../../services/api";
+import { Player, PlayerFilterOptions, TableRow } from "../../types";
+import {TableComponent} from "../TableComponent";
 import { getAge } from "../../utils";
-import styles from "./playerTable.styles.module.css";
 
 interface PlayerTableProps {
-  players: Player[];
-  isLoading?: boolean;
-  error?: string;
+ filters?: PlayerFilterOptions;
 }
 
-const PlayerTable: React.FC<PlayerTableProps> = ({
-  players,
-  isLoading = false,
-  error,
+const PLAYER_COLUMNS = ['Name', 'Team', 'Position', 'Bats', 'Throws', 'Age', 'Height', 'Weight', 'Birth Place']
+
+export const PlayerTable: React.FC<PlayerTableProps> = ({
+  filters = {},
 }) => {
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string>("");
+  const {team, position} = filters;
 
-  // TODO: @bsoni Add a click handler to navigate to the player details page when a player's name is clicked
-  const handlePlayerClick = (playerId: number) => {}
+  useEffect(() => {
+    setIsLoading(true);
+    setError("");
+    ApiService.getPlayers({team, position})
+      .then(setPlayers)
+      .catch((err) => setError(err.message))
+      .finally(() => setIsLoading(false));
+  }, [team, position]);
 
-  if (isLoading) {
-    return (
-      <div className={styles.playerTable}>
-        <div className={styles.loading} role="status">Loading players...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={styles.playerTable}>
-        <div className={styles.error} role="alert">Error: {error}</div>
-      </div>
-    );
-  }
-
-  if (players.length === 0) {
-    return (
-      <div className={styles.playerTable}>
-        <div className={styles.noData} role="status">No players found.</div>
-      </div>
-    );
-  }
+  const rows = useMemo(() => players.map((player) => ({
+    id: player.player_id,
+    cells: [
+      player.first_name + " " + player.last_name,
+      player.team,
+      player.primary_position,
+      player.bats,
+      player.throws,
+      getAge(player.birthdate),
+      `${player.height_feet}' ${player.height_inches}"`,
+      `${player.weight} lbs`,
+      `${player.birth_state === "NULL" ? "" : `${player.birth_state}, `}${player.birth_country}`
+    ]
+  } as TableRow)), [players]);
 
   return (
-    <div className={styles.playerTable}>
-      <h2 id="player-table-heading">Players ({players.length} players)</h2>
-
-      <div className="table-container">
-        <table aria-labelledby="player-table-heading">
-          <thead>
-            <tr>
-              <th scope="col">Name</th>
-              <th scope="col">Team</th>
-              <th scope="col">Position</th>
-              <th scope="col">Bats</th>
-              <th scope="col">Throws</th>
-              <th scope="col">Age</th>
-              <th scope="col">Height</th>
-              <th scope="col">Weight</th>
-              <th scope="col">Birth Place</th>
-            </tr>
-          </thead>
-          <tbody>
-            {players.map((player, index) => (
-              <tr key={player.player_id}
-                data-testid={`player-row-${player.player_id}`}
-                className={index % 2 === 0 ? styles.evenRow : styles.oddRow}
-              >
-                <td className={styles.playerName} role="button" tabIndex={0} onClick={()=>handlePlayerClick(player.player_id)}>
-                  {player.first_name} {player.last_name}
-                  </td>
-                <td className={styles.teamName}>{player.team}</td>
-                <td>{player.primary_position}</td>
-                <td>{player.bats}</td>
-                <td>{player.throws}</td>
-                <td>{getAge(player.birthdate)}</td>
-                <td>{player.height_feet}' {player.height_inches}"</td>
-                <td>{player.weight} lbs</td>
-                <td>{player.birth_state === "NULL" ? "" : `${player.birth_state}, `}{player.birth_country}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* TODO: Add table features if time permits */}
-      {/* Consider adding:
-          - Sorting by column headers
-          - Pagination for large datasets
-          - Row highlighting on hover
-          - Click to view player details
-      */}
-    </div>
+    <TableComponent
+      tableName="players"
+      columns={PLAYER_COLUMNS}
+      data={rows}
+      isLoading={isLoading}
+      error={error}
+      onRowClick={(rowId) => {
+        const player = players.find(p => p.player_id === rowId);
+        if (player) {
+          // TODO: Implement navigation to player details page, e.g., using React Router's useNavigate
+        }
+      }}
+    />
   );
 };
-
-export default PlayerTable;

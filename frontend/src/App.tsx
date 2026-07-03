@@ -1,29 +1,29 @@
 import React, { useState } from "react";
-import "./App.css";
+import styles from "./styles/styles.module.css";
 import { PlayerFilterOptions } from "./types";
 import { PlayerFilterWrapper } from "./components/PlayerFilterControls";
-import { PlayerTableWrapper } from "./components/PlayerTable";
+import { PlayerTable } from "./components/PlayerTable";
 
 const App: React.FC = () => {
   const [filters, setFilters] = useState<PlayerFilterOptions>({});
 
   return (
-    <div className="App">
+    <div className={styles.App}>
       <header>
         <h1>Baseball Player Statistics</h1>
         <p>Explore player statistics</p>
       </header>
 
       <main>
-        <section className="filter-section">
+        <section className={styles.filterSection}>
           <PlayerFilterWrapper
             onFilterChange={setFilters}
             filters={filters}
           />
         </section>
 
-        <section className="data-section">
-          <PlayerTableWrapper filters={filters} />
+        <section className={styles.dataSection}>
+          <PlayerTable filters={filters} />
         </section>
 
         {/* TODO: Pitch Filter Controls}

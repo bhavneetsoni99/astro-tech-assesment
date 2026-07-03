@@ -295,6 +295,7 @@ Since we do not have any designs avaiable, I have tried to emulate [ESPNs Player
 5. Implemented `position` list api to fetch all possible position values from DB
 6. Implemented `teams` list api to fetch all possible team values from DB
 7. Implemented `PlayerFilters` component and functionality, playerFilter wrapped into a wrapper component to seperate concerns for Data fetching and business logic
+8. Abstracting `Table Component` into a reusable that can be used with `Players` and `Pitches` table
 
 ### Code Organization
 
@@ -311,8 +312,9 @@ Tests were written alongside feature implementation, following the existing Vite
 3.  Added unit test for `PlayerTable` component
 4.  Added `player/:id` lookup and `teams` list unit tests
 5.  Added `position` list unit test
-6.  Added `position` list unit test
-7.  Add unit tests for player filter component
+6.  Add unit tests for player filter component
+7.  Added unit test for `TableComponent`
+8.  Added integration tests for `Player Table`
 
 #### E2E Tests Added:
 

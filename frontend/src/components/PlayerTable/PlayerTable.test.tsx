@@ -1,16 +1,25 @@
 import { describe, test, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import PlayerTable from "./PlayerTable";
+import { render, screen, waitFor } from "@testing-library/react";
 import { Player } from "../../types";
-import * as utils from "../../utils/utils";
+import { PlayerTable } from "./PlayerTable";
 
-vi.mock("../../utils/utils", () => ({
+const mockGet = vi.hoisted(() => vi.fn());
+
+vi.mock("axios", () => ({
+  default: {
+    create: vi.fn(() => ({
+      get: mockGet,
+    })),
+  },
+}));
+
+vi.mock("../../utils", () => ({
   getAge: vi.fn(() => 25),
 }));
 
 const mockPlayers: Player[] = [
-    {
-      player_id: 453286,
+  {
+    player_id: 453286,
       first_name: 'Maxwell',
       last_name: 'Scherzer',
       bats: 'R',
@@ -23,9 +32,9 @@ const mockPlayers: Player[] = [
       weight: 208,
       team: 'TOR',
       primary_position: 'RHS'
-    },
-    {
-      player_id: 506433,
+  },
+  {
+    player_id: 506433,
       first_name: 'Yu',
       last_name: 'Darvish',
       bats: 'R',
@@ -41,56 +50,110 @@ const mockPlayers: Player[] = [
     }
   ]
 
-describe("PlayerTable", () => {
-  test("renders loading state", () => {
-    render(<PlayerTable players={[]} isLoading={true} />);
-    expect(screen.getByText("Loading players...")).toBeInTheDocument();
+describe("PlayerTable integration", () => {
+  test("shows loading state on mount, then renders players", async () => {
+    mockGet.mockResolvedValue({ data: mockPlayers });
+
+    const { container } = render(<PlayerTable />);
+
+    expect(container.querySelector('[class*="loadingOverlay"]')).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText("Maxwell Scherzer")).toBeInTheDocument();
+    });
+
+    expect(container.querySelector('[class*="loadingOverlay"]')).not.toBeInTheDocument();
+    expect(screen.getByText("Yu Darvish")).toBeInTheDocument();
+    expect(screen.getByText("2 Players")).toBeInTheDocument();
   });
 
-  test("renders error state", () => {
-    render(<PlayerTable players={[]} error="Failed to fetch" />);
-    expect(screen.getByText("Error: Failed to fetch")).toBeInTheDocument();
-  });
+  test("renders all expected columns", async () => {
+    mockGet.mockResolvedValue({ data: mockPlayers });
 
-  test("renders empty state when no players", () => {
-    render(<PlayerTable players={[]} />);
-    expect(screen.getByText("No players found.")).toBeInTheDocument();
-  });
+    render(<PlayerTable />);
 
-  test("displays correct player count", () => {
-    render(<PlayerTable players={mockPlayers} />);
-    expect(screen.getByText("Players (2 players)")).toBeInTheDocument();
-  });
-
-  test("renders all table headers", () => {
-    render(<PlayerTable players={mockPlayers} />);
     const headers = ["Name", "Team", "Position", "Bats", "Throws", "Age", "Height", "Weight", "Birth Place"];
-    headers.forEach((header) => {
-      expect(screen.getByText(header)).toBeInTheDocument();
+    await waitFor(() => {
+      headers.forEach((header) => {
+        expect(screen.getByText(header)).toBeInTheDocument();
+      });
     });
   });
 
-  test("renders player data correctly", () => {
-    render(<PlayerTable players={mockPlayers} />);
-    expect(screen.getByTestId("player-row-453286")).toBeInTheDocument();
-  });
+  test("transforms player data into table rows correctly", async () => {
+    mockGet.mockResolvedValue({ data: mockPlayers });
 
+    render(<PlayerTable />);
 
-  test("calls getAge with correct birthdate for each player", () => {
-    render(<PlayerTable players={mockPlayers} />);
-    expect(utils.getAge).toHaveBeenCalledWith("1984-07-27");
-    expect(utils.getAge).toHaveBeenCalledWith("1986-08-16");
-  });
+    await waitFor(() => {
+      expect(screen.getByTestId("row-453286")).toBeInTheDocument();
+    });
 
-  test("renders birth place values", () => {
-    render(<PlayerTable players={mockPlayers} />);
+    expect(screen.getByTestId("row-506433")).toBeInTheDocument();
+    expect(screen.getByText("Maxwell Scherzer")).toBeInTheDocument();
+    expect(screen.getByText("TOR")).toBeInTheDocument();
+    expect(screen.getAllByText("RHS")).toHaveLength(2);
     expect(screen.getByText("MO, USA")).toBeInTheDocument();
+    expect(screen.getByText("Japan")).toBeInTheDocument();
+    expect(screen.getByText("6' 3\"")).toBeInTheDocument();
+    expect(screen.getByText("6' 5\"")).toBeInTheDocument();
+    expect(screen.getByText("208 lbs")).toBeInTheDocument();
+    expect(screen.getByText("220 lbs")).toBeInTheDocument();
   });
 
+  test("shows error state when API call fails", async () => {
+    mockGet.mockRejectedValue(new Error("Network error"));
 
-  test("renders correct number of rows", () => {
-    const { container } = render(<PlayerTable players={mockPlayers} />);
-    const rows = container.querySelectorAll("tbody tr");
-    expect(rows).toHaveLength(2);
+    render(<PlayerTable />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent("Error: Network error");
+    });
+  });
+
+  test("refetches when filters change", async () => {
+    mockGet.mockResolvedValue({ data: mockPlayers });
+
+    const { rerender } = render(<PlayerTable filters={{}} />);
+
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith("/players", {
+        params: {},
+      });
+    });
+
+    mockGet.mockClear();
+    mockGet.mockResolvedValue({ data: [mockPlayers[0]] });
+
+    rerender(<PlayerTable filters={{ team: "TOR" }} />);
+
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith("/players", {
+        params: { team: "TOR" },
+      });
+    });
+  });
+
+  test("applies all filter params to the API call", async () => {
+    mockGet.mockResolvedValue({ data: [] });
+
+    render(<PlayerTable filters={{ team: "SD", position: "RHS" }} />);
+
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith("/players", {
+        params: { team: "SD", position: "RHS" },
+      });
+    });
+  });
+
+  test("renders correct number of rows", async () => {
+    mockGet.mockResolvedValue({ data: mockPlayers });
+
+    const { container } = render(<PlayerTable />);
+
+    await waitFor(() => {
+      const rows = container.querySelectorAll("tbody tr");
+      expect(rows).toHaveLength(2);
+    });
   });
 });

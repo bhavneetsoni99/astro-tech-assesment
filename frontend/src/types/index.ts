@@ -1,5 +1,3 @@
-// TODO: Define TypeScript interfaces for your data types here
-
 export interface Player {
   player_id: number;
   first_name: string;
@@ -23,4 +21,9 @@ export interface Pitch {
 export interface PlayerFilterOptions {
   team?: string;
   position?: string;
+}
+
+export interface TableRow {
+  id: number | string;
+  cells: string[];
 }
