@@ -1,22 +1,24 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import select
+from sqlalchemy import select, func
 import os
 import pandas as pd
 from typing import List, Optional
 from schemas import PitchSchema, PlayerSchema
 from pathlib import Path
+from sqlalchemy.orm import joinedload
 
+BASE_DIR = Path(__file__).resolve().parent
+
+if os.environ.get("RUNNING_BASEBALL_TESTS") == "TRUE":
+    DB_PATH = BASE_DIR / "data" / "test_baseball_isolated.db"
+else:
+    DB_PATH = BASE_DIR / "data" / "baseball.db"
 # Initialize Flask app and extensions
 app = Flask(__name__)
 CORS(app)
 
-# Get the directory where main.py is located
-BASE_DIR = Path(__file__).resolve().parent
-print(f"Base directory: {BASE_DIR}")
-DB_PATH = BASE_DIR / "data" / "baseball.db"
-print(f"Using database path: {DB_PATH}")
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DB_PATH}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -53,10 +55,13 @@ class Pitch(db.Model):
     # Pitch identification
     pitch_type = db.Column(db.String,  nullable=True)
     game_date = db.Column(db.String, nullable=False)
+    pitch_name = db.Column(db.String, nullable=True)
 
     # Pitcher and batter
-    pitcher = db.Column(db.Integer, nullable=False)
-    batter = db.Column(db.Integer, nullable=False)
+    pitcher = db.Column(db.Integer, db.ForeignKey("players.player_id"), nullable=False)
+    batter = db.Column(db.Integer, db.ForeignKey("players.player_id"), nullable=False)
+    pitcher_details = db.relationship("Player", foreign_keys=[pitcher], backref="pitches_as_pitcher")
+    batter_details = db.relationship("Player", foreign_keys=[batter], backref="pitches_as_batter")
 
     # Pitch characteristics
     release_speed = db.Column(db.String, nullable=True)
@@ -101,7 +106,6 @@ def health_check():
     """Health check endpoint."""
     return jsonify({"status": "healthy"}), 200
 
-# TODO: Implement the routes for players and pitches below, feel free to modify them as necessary and/or create additional routes and helpers as needed.
 @app.route("/players", methods=["GET"])
 def get_players():
     """
@@ -110,20 +114,17 @@ def get_players():
     team_arg = request.args.get("team")
     position_arg = request.args.get("position")
 
-    selectPlayers = select(Player)
+    select_players = select(Player)
 
     if team_arg:
         normalized_team_name = team_arg.strip().lower()
-        selectPlayers = selectPlayers.where(Player.team.ilike(normalized_team_name))
+        select_players = select_players.where(Player.team.ilike(normalized_team_name))
 
     if position_arg:
         normalized_position = position_arg.strip().lower()
-        selectPlayers = selectPlayers.where(Player.primary_position.ilike(normalized_position))
-    #  TODO: Housekeeping - Add pagination support to the players endpoint to limit the number of results returned per request. (page number and page size)
-    #  TODO: Housekeeping - Add sorting support to the players endpoint to allow clients to sort the results by different fields (e.g., last name, team, position).
-    #  TODO: Housekeeping - Add filtering support for more parameters 
-   
-    players = db.session.execute(selectPlayers).scalars().all()
+        select_players = select_players.where(Player.primary_position.ilike(normalized_position))
+
+    players = db.session.execute(select_players).scalars().all()
 
     schema = PlayerSchema(many=True)
     result = schema.dump(players)
@@ -142,12 +143,14 @@ def get_player(player_id):
 
 @app.route("/teams", methods=["GET"])
 def get_teams():
+    """Get all distinct teams sorted alphabetically."""
     select_teams = select(Player.team).distinct().order_by(Player.team.asc())
     teams = db.session.execute(select_teams).scalars().all()
     return jsonify(teams), 200
 
 @app.route("/positions", methods=["GET"])
 def get_positions():
+    """Get all distinct positions sorted alphabetically."""
     select_positions = select(Player.primary_position).distinct().order_by(Player.primary_position.asc())
     positions = db.session.execute(select_positions).scalars().all()
     return jsonify(positions), 200
@@ -157,11 +160,94 @@ def get_pitches():
     """
     Get all pitches or filter by various fields such as player, team, date, etc.
     """
-    # TODO: Implement pitch retrieval with optional filtering
-    # Below is a simple example returning a subset of pitches
-    pitches = Pitch.query.limit(1000).all()
+    pitcher_arg = request.args.get("pitcher")
+    batter_arg = request.args.get("batter")
+    pitch_name_arg = request.args.get("pitch_name")
+    pitching_team_arg = request.args.get("pitching_team")
+    batting_team_arg = request.args.get("batting_team")
+
+    release_speed_arg = request.args.get("release_speed")
+
+    limit = request.args.get("limit", default=1000, type=int)
+    cursor = request.args.get("next_cursor", default=None, type=int)
+
+    select_pitches = select(Pitch).order_by(Pitch.rowid.asc())
+
+    if pitcher_arg:
+        try:
+            pitcher_int = int(pitcher_arg)
+            select_pitches = select_pitches.where(Pitch.pitcher == pitcher_int)
+        except ValueError:
+            pass
+
+    if batter_arg:
+        try:
+            batter_int = int(batter_arg)
+            select_pitches = select_pitches.where(Pitch.batter == batter_int)
+        except ValueError:
+            pass
+
+    if release_speed_arg:
+        try:
+            speed_val = float(release_speed_arg)
+            select_pitches = select_pitches.where(Pitch.release_speed >= speed_val)
+        except ValueError:
+            pass
+
+    if pitch_name_arg:
+        select_pitches = select_pitches.where(Pitch.pitch_name == pitch_name_arg)
+
+    if pitching_team_arg:
+        select_pitches = select_pitches.join(Pitch.pitcher_details).where(
+            Player.team == pitching_team_arg
+        )
+
+    if batting_team_arg:
+        select_pitches = select_pitches.join(Pitch.batter_details).where(
+            Player.team == batting_team_arg
+        )
+
+    total_count = None
+    if cursor is None:
+        count_query = select(func.count()).select_from(select_pitches.subquery())
+        total_count = db.session.scalar(count_query)
+    else:
+        select_pitches = select_pitches.where(Pitch.rowid > cursor)
+        total_count = None
+
+    paginated_query = select_pitches.limit(limit)
+
+    pitches = db.session.scalars(
+        paginated_query.options(
+            joinedload(getattr(Pitch, "pitcher_details")),
+            joinedload(getattr(Pitch, "batter_details"))
+        )
+    ).all()
+
+    next_cursor = pitches[-1].rowid if len(pitches) == limit else None
+
     schema = PitchSchema(many=True)
     result = schema.dump(pitches)
 
-    return jsonify(result), 200
+    return jsonify({
+        "pitches": result,
+        "total_count": total_count,
+        "next_cursor": next_cursor,
+        "limit": limit
+    }), 200
 
+@app.route("/pitch_names", methods=["GET"])
+def get_pitch_names():
+    """Get all distinct pitch names sorted alphabetically."""
+    select_pitch_names = select(Pitch.pitch_name).distinct().order_by(Pitch.pitch_name.asc())
+    pitch_names = db.session.execute(select_pitch_names).scalars().all()
+    return jsonify(pitch_names), 200
+
+
+@app.route("/players_list", methods=["GET"])
+def get_players_list():
+    """Get all players with their IDs, first and last names."""
+    select_players = select(Player.player_id, Player.first_name, Player.last_name).order_by(Player.first_name.asc())
+    players = db.session.execute(select_players).mappings().all()
+    players_list = [dict(row) for row in players]
+    return jsonify(players_list), 200
