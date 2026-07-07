@@ -1,71 +1,113 @@
-import pytest
+import os
+import sys
+from pathlib import Path
 
+os.environ["RUNNING_BASEBALL_TESTS"] = "TRUE"
+
+import pytest
 from main import app, db, Player, Pitch
 
-
-@pytest.fixture
+@pytest.fixture(scope="function")
 def client():
     """Create a test client for the Flask application."""
+    
+    ctx = app.app_context()
+    ctx.push()
+    db.drop_all()
+    db.create_all()
 
-    # Point to the actual baseball database for now
-    app.config["TESTING"] = True
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    player1 = Player(
+        player_id=453286,
+        first_name="Maxwell",
+        last_name="Scherzer",
+        birthdate="1984-07-27",
+        birth_country="USA",
+        birth_state="MO",
+        height_feet=6,
+        height_inches=3,
+        weight=208,
+        team="TOR",
+        primary_position="RHS",
+        throws="R",
+        bats="R",
+    )
 
-    with app.test_client() as client:
-        with app.app_context():
-            db.drop_all()
-            db.create_all()
+    player2 = Player(
+        player_id=506433,
+        first_name="Yu",
+        last_name="Darvish",
+        birthdate="1986-08-16",
+        birth_country="Japan",
+        birth_state="NULL",
+        height_feet=6,
+        height_inches=5,
+        weight=220,
+        team="SD",
+        primary_position="RHS",
+        throws="R",
+        bats="R",
+    )
+    player3 = Player(
+        player_id=999999,
+        first_name="Shohei",
+        last_name="Ohtani",
+        birthdate="1994-07-05",
+        birth_country="Japan",
+        birth_state="NULL",
+        height_feet=6,
+        height_inches=4,
+        weight=210,
+        team="LAD",
+        primary_position="LHS",
+        throws="R",
+        bats="L",
+    )
 
-            player1 = Player(
-                id=453286,
-                first_name="Maxwell",
-                last_name="Scherzer",
-                birthdate="1984-07-27",
-                birth_country="USA",
-                birth_state="MO",
-                height_feet=6,
-                height_inches=3,
-                weight=208,
-                team="TOR",
-                primary_position="RHS",
-                throws="R",
-                bats="R",
-            )
+    pitch1 = Pitch(
+        pitch_type="FF",
+        game_date="2024-06-01",
+        pitch_name="Fastball",
+        pitcher=453286,
+        batter=506433,
+        release_speed="95.2",
+        type="S",
+        description="called_strike",
+        events="called_strike",
+    )
+    pitch2 = Pitch(
+        pitch_type="SL",
+        game_date="2024-06-01",
+        pitch_name="Slider",
+        pitcher=453286,
+        batter=999999,
+        release_speed="88.1",
+        type="B",
+        description="ball",
+        events="ball",
+    )
 
-            player2 = Player(
-                id=506433,
-                first_name="Yu",
-                last_name="Darvish",
-                birthdate="1986-08-16",
-                birth_country="Japan",
-                birth_state="NULL",
-                height_feet=6,
-                height_inches=5,
-                weight=220,
-                team="SD",
-                primary_position="RHS",
-                throws="R",
-                bats="R",
-            )
-            player3 = Player(
-                id=999999,
-                first_name="Shohei",
-                last_name="Ohtani",
-                birthdate="1994-07-05",
-                birth_country="Japan",
-                birth_state="NULL",
-                height_feet=6,
-                height_inches=4,
-                weight=210,
-                team="LAD",
-                primary_position="LHS",
-                throws="R",
-                bats="L",
-            )
-            db.session.add_all([player1, player2, player3])
-            db.session.commit()
+    pitch3 = Pitch(
+        pitch_type="FF",
+        game_date="2024-06-02",
+        pitch_name="Fastball",
+        pitcher=506433,
+        batter=453286,
+        release_speed="92.7",
+        type="X",
+        description="hit_into_play",
+        events="single",
+    )
 
-            yield client
+    db.session.add_all([player1, player2, player3])
+    db.session.add_all([pitch1, pitch2, pitch3])
+    db.session.commit()
+
+    with app.test_client() as test_client:
+        yield test_client
+
+    db.session.remove()
+    db.drop_all()
+    ctx.pop()
 
 
 class TestHealthCheck:
@@ -159,3 +201,71 @@ class TestPositionsAPI:
         assert response.status_code == 200
         data = response.get_json()
         assert data == ["LHS", "RHS"]
+
+class TestPitchesAPI:
+    """Test pitch-related API endpoints."""
+
+    def test_get_pitches_returns_all_pitches(self, client):
+        """Test that the pitches endpoint returns the expected payload structure."""
+        response = client.get("/pitches")
+        assert response.status_code == 200
+
+        data = response.get_json()
+        assert data["limit"] ==1000
+        assert data["total_count"] == 3
+        assert data["next_cursor"] is None
+        assert len(data["pitches"]) == 3
+        assert {pitch["pitch_name"] for pitch in data["pitches"]} == {"Fastball", "Slider"}
+
+    def test_get_pitches_filters_by_pitcher(self, client):
+        """Test filtering pitches by pitcher ID."""
+        response = client.get("/pitches?pitcher=453286")
+        assert response.status_code == 200
+
+        data = response.get_json()
+        assert len(data["pitches"]) == 2
+        assert {pitch["pitcher"] for pitch in data["pitches"]} == {453286}
+        assert {pitch["pitch_name"] for pitch in data["pitches"]} == {"Fastball", "Slider"}
+
+    def test_get_pitches_filters_by_pitch_name(self, client):
+        """Test filtering pitches by pitch name."""
+        response = client.get("/pitches?pitch_name=Fastball")
+        assert response.status_code == 200
+
+        data = response.get_json()
+        assert len(data["pitches"]) == 2
+        assert all(pitch["pitch_name"] == "Fastball" for pitch in data["pitches"])
+
+    def test_get_pitches_filters_by_release_speed(self, client):
+        """Test filtering pitches by a minimum release speed."""
+        response = client.get("/pitches?release_speed=90")
+        assert response.status_code == 200
+
+        data = response.get_json()
+        assert len(data["pitches"]) == 2
+        assert {pitch["pitch_name"] for pitch in data["pitches"]} == {"Fastball"}
+
+
+class TestPitchNamesAPI:
+    """Test pitch_names-related API endpoints."""
+
+    def test_get_pitch_names(self, client):
+        """Test getting all distinct pitch names sorted alphabetically."""
+        response = client.get("/pitch_names")
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data == ["Fastball", "Slider"]
+
+
+class TestPlayersListAPI:
+    """Test players_list-related API endpoints."""
+
+    def test_get_players_list(self, client):
+        """Test getting all players with their IDs, first and last names."""
+        response = client.get("/players_list")
+        assert response.status_code == 200
+        data = response.get_json()
+        assert len(data) == 3
+        
+        player_ids = {p["player_id"] for p in data}
+        assert player_ids == {453286, 506433, 999999}

@@ -26,13 +26,16 @@ class PlayerSchema(Schema):
 class PitchSchema(Schema):
     """Schema for pitch data validation and serialization."""
 
+    rowid = fields.Integer(required=True)
     # Pitch identification
     pitch_type = fields.String(allow_none=True)
     game_date = fields.String(required=True)
-
+    pitch_name = fields.String(allow_none=True)
     # Pitcher and batter
     pitcher = fields.Integer(required=True)
+    pitcher_details = fields.Nested(PlayerSchema, only=["first_name", "last_name", "team"], allow_none=True)
     batter = fields.Integer(required=True)
+    batter_details = fields.Nested(PlayerSchema, only=["first_name", "last_name", "team"], allow_none=True)
 
     # Pitch characteristics
     release_speed = fields.String(allow_none=True)
