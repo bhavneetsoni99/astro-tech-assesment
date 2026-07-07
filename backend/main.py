@@ -7,7 +7,7 @@ import pandas as pd
 from typing import List, Optional
 from schemas import PitchSchema, PlayerSchema
 from pathlib import Path
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, aliased
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -113,6 +113,9 @@ def get_players():
     """
     team_arg = request.args.get("team")
     position_arg = request.args.get("position")
+    throws_arg = request.args.get("throws")
+    bats_arg = request.args.get("bats")
+
 
     select_players = select(Player)
 
@@ -123,6 +126,14 @@ def get_players():
     if position_arg:
         normalized_position = position_arg.strip().lower()
         select_players = select_players.where(Player.primary_position.ilike(normalized_position))
+
+    if throws_arg:
+        normalized_throws = throws_arg.strip().lower()
+        select_players = select_players.where(Player.throws.ilike(normalized_throws))
+
+    if bats_arg:
+        normalized_bats = bats_arg.strip().lower()
+        select_players = select_players.where(Player.bats.ilike(normalized_bats))
 
     players = db.session.execute(select_players).scalars().all()
 
@@ -168,8 +179,11 @@ def get_pitches():
 
     release_speed_arg = request.args.get("release_speed")
 
-    limit = request.args.get("limit", default=1000, type=int)
+    limit = request.args.get("limit", default=500, type=int)
     cursor = request.args.get("next_cursor", default=None, type=int)
+
+    Pitcher = aliased(Player)
+    Batter = aliased(Player)
 
     select_pitches = select(Pitch).order_by(Pitch.rowid.asc())
 
@@ -198,13 +212,14 @@ def get_pitches():
         select_pitches = select_pitches.where(Pitch.pitch_name == pitch_name_arg)
 
     if pitching_team_arg:
-        select_pitches = select_pitches.join(Pitch.pitcher_details).where(
-            Player.team == pitching_team_arg
+        select_pitches = select_pitches.join(Pitcher, Pitch.pitcher_details).where(
+            Pitcher.team == pitching_team_arg
         )
 
+    # FIX: Explicitly join on the alias using the relationship attribute
     if batting_team_arg:
-        select_pitches = select_pitches.join(Pitch.batter_details).where(
-            Player.team == batting_team_arg
+        select_pitches = select_pitches.join(Batter, Pitch.batter_details).where(
+            Batter.team == batting_team_arg
         )
 
     total_count = None
