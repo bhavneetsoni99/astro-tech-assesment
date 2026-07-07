@@ -299,6 +299,8 @@ Since we do not have any designs avaiable, I have tried to emulate [ESPNs Player
 9. Added `pitches` endpoint with filtering and cursor base pagination
 10. Added `pitch_names` and `player_names` end points to fetch data for filters
 11. Implemented `pitches`, `pitch_names` and `player_names` apis on the FE
+12. Showing both `Pitch` and `Player` tables in the same page was getting cluttered and would have bad user experience on smaller view ports, Added client-side routing to the frontend so the dashboard can render dedicated player and pitch experiences from a shared shell.
+13. Added React Router, for navigation links and nested routes.
 
 ### Code Organization
 
@@ -321,6 +323,7 @@ Tests were written alongside feature implementation, following the existing Vite
 9.  Added unit tests for `pitches`, `pitch_names` and `players`
 10. Isolated Test Databse from the dev db for proper isolation of the test cases
 11. Added unit test for `pitches`, `pitch_names` and `players` on the UI side
+12. Added unit tests for `App.tsx`
 
 #### E2E Tests Added:
 
