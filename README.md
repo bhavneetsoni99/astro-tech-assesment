@@ -298,6 +298,7 @@ Since we do not have any designs avaiable, I have tried to emulate [ESPNs Player
 8. Abstracting `Table Component` into a reusable that can be used with `Players` and `Pitches` table
 9. Added `pitches` endpoint with filtering and cursor base pagination
 10. Added `pitch_names` and `player_names` end points to fetch data for filters
+11. Implemented `pitches`, `pitch_names` and `player_names` apis on the FE
 
 ### Code Organization
 
@@ -317,8 +318,9 @@ Tests were written alongside feature implementation, following the existing Vite
 6.  Add unit tests for player filter component
 7.  Added unit test for `TableComponent`
 8.  Added integration tests for `Player Table`
-9.  Addedunit tests for `pitches`, `pitch_names` and `players`
+9.  Added unit tests for `pitches`, `pitch_names` and `players`
 10. Isolated Test Databse from the dev db for proper isolation of the test cases
+11. Added unit test for `pitches`, `pitch_names` and `players` on the UI side
 
 #### E2E Tests Added:
 

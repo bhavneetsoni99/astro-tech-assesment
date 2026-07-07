@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Player, PlayerFilterOptions } from "../types";
+import { Player, PlayerFilterOptions, PlayerInfo, PitchFilterOptions, PitchesResponse } from "../types";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "/";
 
@@ -32,7 +32,22 @@ export class ApiService {
     return positionNames;
   }
 
-  // TODO: add additional endpoint calls as needed.
+  static async getPlayersList(): Promise<PlayerInfo[]> {
+    const response = await api.get("/players_list");
+    const playersList: PlayerInfo[] = response.data;
+    return playersList;
+  }
+
+  static async getPitchNames(): Promise<string[]> {
+    const response = await api.get("/pitch_names");
+    const pitchTypes: string[] = response.data;
+    return pitchTypes;
+  }
+
+  static async getPitches(filters?: PitchFilterOptions): Promise<PitchesResponse>{
+    const response = await api.get("/pitches", { params: filters });
+    return response.data;
+  }
 
   /**
    * Health check endpoint

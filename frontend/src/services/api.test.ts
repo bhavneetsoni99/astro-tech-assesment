@@ -68,6 +68,62 @@ describe("ApiService", () => {
     });
   });
 
+  describe("getPitchNames", () => {
+    test("calls GET /pitch-types and returns pitch types", async () => {
+      const pitchNames = ["FF", "SL", "CH"];
+      mockGet.mockResolvedValue({ data: pitchNames });
+
+      const result = await ApiService.getPitchNames();
+
+      expect(mockGet).toHaveBeenCalledWith("/pitch_names");
+      expect(result).toEqual(pitchNames);
+    });
+  });
+
+  describe("getPitches", () => {
+    test("calls GET /pitches and returns pitches response", async () => {
+      const pitchResponse = {
+        pitches: [
+          {
+            rowid: 1,
+            pitch_type: "FF",
+            pitch_name: "Fastball",
+            release_speed: "95.2",
+            type: "S",
+            batter: 506433,
+            batter_details: { first_name: "Yu", last_name: "Darvish", team: "SD" },
+            pitcher: 453286,
+            pitcher_details: { first_name: "Maxwell", last_name: "Scherzer", team: "TOR" },
+            description: "called_strike",
+            events: "called_strike",
+            game_date: "2024-06-01",
+          },
+        ],
+        total_count: 1,
+        next_cursor: null,
+        limit: 1000,
+      };
+      mockGet.mockResolvedValue({ data: pitchResponse });
+
+      const result = await ApiService.getPitches();
+
+      expect(mockGet).toHaveBeenCalledWith("/pitches", {
+        params: undefined,
+      });
+      expect(result).toEqual(pitchResponse);
+    });
+
+    test("passes filters as query params", async () => {
+      mockGet.mockResolvedValue({ data: { pitches: [], total_count: 0, next_cursor: null, limit: 1000 } });
+
+      await ApiService.getPitches({ pitcher: 453286, pitch_name: "Fastball", release_speed: "90" });
+
+      expect(mockGet).toHaveBeenCalledWith("/pitches", {
+        params: { pitcher: 453286, pitch_name: "Fastball", release_speed: "90" },
+      });
+    });
+  });
+
   describe("healthCheck", () => {
     test("calls GET /health and returns status", async () => {
       const health = { status: "healthy" };
