@@ -211,7 +211,7 @@ class TestPitchesAPI:
         assert response.status_code == 200
 
         data = response.get_json()
-        assert data["limit"] ==1000
+        assert data["limit"] ==500
         assert data["total_count"] == 3
         assert data["next_cursor"] is None
         assert len(data["pitches"]) == 3
