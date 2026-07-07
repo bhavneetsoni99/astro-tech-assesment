@@ -1,4 +1,5 @@
 import React, {useEffect, useMemo, useState} from "react";
+import { useNavigate } from 'react-router-dom';
 import ApiService from "../../services/api";
 import { Player, PlayerFilterOptions, TableRow } from "../../types";
 import {TableComponent} from "../TableComponent";
@@ -13,19 +14,21 @@ const PLAYER_COLUMNS = ['Name', 'Team', 'Position', 'Bats', 'Throws', 'Age', 'He
 export const PlayerTable: React.FC<PlayerTableProps> = ({
   filters = {},
 }) => {
+  const navigate = useNavigate();
   const [players, setPlayers] = useState<Player[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
-  const {team, position} = filters;
+  const {team, position, throws, bats} = filters;
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoading(true);
     setError("");
-    ApiService.getPlayers({team, position})
+    ApiService.getPlayers({team, position, throws, bats})
       .then(setPlayers)
       .catch((err) => setError(err.message))
       .finally(() => setIsLoading(false));
-  }, [team, position]);
+  }, [team, position, throws, bats]);
 
   const rows = useMemo(() => players.map((player) => ({
     id: player.player_id,
@@ -52,7 +55,7 @@ export const PlayerTable: React.FC<PlayerTableProps> = ({
       onRowClick={(rowId) => {
         const player = players.find(p => p.player_id === rowId);
         if (player) {
-          // TODO: Implement navigation to player details page, e.g., using React Router's useNavigate
+          navigate(`/player-details/${rowId}`);
         }
       }}
     />

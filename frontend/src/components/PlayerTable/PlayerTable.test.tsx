@@ -3,6 +3,12 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { Player } from "../../types";
 import { PlayerTable } from "./PlayerTable";
 
+const mockNavigate = vi.fn();
+
+vi.mock("react-router-dom", () => ({
+  useNavigate: () => mockNavigate,
+}));
+
 const mockGet = vi.hoisted(() => vi.fn());
 
 vi.mock("axios", () => ({

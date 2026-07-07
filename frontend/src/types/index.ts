@@ -21,6 +21,8 @@ export interface Pitch {
 export interface PlayerFilterOptions {
   team?: string;
   position?: string;
+  throws?: string
+  bats?: string
 }
 
 export interface TableRow {
