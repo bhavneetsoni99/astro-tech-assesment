@@ -8,25 +8,30 @@ interface PlayerTableWrapperProps {
  onFilterChange: React.Dispatch<React.SetStateAction<PlayerFilterOptions>>
 }
 
+interface PlayerFilterState {
+  availablePositions?: string[]
+  availableTeams?: string[]
+} 
+
 export const PlayerFilterWrapper: React.FC<PlayerTableWrapperProps> = ({
   filters = {},
   onFilterChange
 }) => {
-  const [availableTeams, setAvailableTeams] = useState<string[]>([]);
-  const [availablePositions, setAvailablePositions] = useState<string[]>([]);
+  const [filterData, setfilterData] = useState<PlayerFilterState>({});
 
-  useEffect(() => {
-    ApiService.getTeams().then((teams) => {
-      setAvailableTeams(teams);
-    }).catch((error) => {
-      setAvailableTeams([]);
-    })
-    ApiService.getPositions().then((positions) => {
-      setAvailablePositions(positions);
-    }).catch((error) => {
-      setAvailablePositions([]);
-    })
-  }, []);
+    useEffect(() => {
+      Promise.all([
+        ApiService.getPositions(),
+         ApiService.getTeams()
+        ]).then(([availablePositions, availableTeams])=> {
+          setfilterData({availablePositions, availableTeams})
+         }).catch((_error) => {
+            setfilterData({});
+          })
+    }, []);
+  
+    const { availablePositions = [], availableTeams = []} = filterData 
+  
 
   return (
     <PlayerFilterControls 

@@ -9,6 +9,9 @@ interface PlayerFilterControlsProps {
   onFilterChange: React.Dispatch<React.SetStateAction<PlayerFilterOptions>>
 }
 
+const BATTING_HAND = ['L', 'R', 'S']
+const THROWING_HAND = ['L', 'R']
+
 
 const PlayerFilterControls: React.FC<PlayerFilterControlsProps> = ({
   availableTeams = [],
@@ -28,7 +31,9 @@ const PlayerFilterControls: React.FC<PlayerFilterControlsProps> = ({
             <select
               id="team-filter"
               value={filters.team || ""}
-              onChange={(event)=> onFilterChange((prevFilters: PlayerFilterOptions) => ({ ...prevFilters, team: event?.target?.value || ''}))}
+              onChange={(event) =>
+                onFilterChange((prevFilters: PlayerFilterOptions) =>
+                  ({ ...prevFilters, team: event?.target?.value || '' }))}
             >
               <option value="">All Teams</option>
               {availableTeams.map((team) => (
@@ -44,13 +49,44 @@ const PlayerFilterControls: React.FC<PlayerFilterControlsProps> = ({
             <select
               id="position-filter"
               value={filters.position || ""}
-              onChange={(event)=> onFilterChange({ ...filters, position: event.target.value })}
+              onChange={(event) => onFilterChange({ ...filters, position: event.target.value })}
             >
               <option value="">All Positions</option>
               {availablePositions.map((position) => (
                 <option key={position} value={position}>
-                  {position}  
-                  </option>
+                  {position}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className={styles.filterGroup}>
+            <label htmlFor="throws-filter">Throws</label>
+            <select
+              id="throws-filter"
+              value={filters.throws || ""}
+              onChange={(event) => onFilterChange({ ...filters, throws: event.target.value })}
+            >
+              <option value="">All</option>
+              {THROWING_HAND.map((hand) => (
+                <option key={hand} value={hand}>
+                  {hand}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className={styles.filterGroup}>
+            <label htmlFor="batting-hand-filter">Bats</label>
+            <select
+              id="batting-hand-filter"
+              value={filters.bats || ""}
+              onChange={(event) => onFilterChange({ ...filters, bats: event.target.value })}
+            >
+              <option value="">All</option>
+              {BATTING_HAND.map((hand) => (
+                <option key={hand} value={hand}>
+                  {hand}
+                </option>
               ))}
             </select>
           </div>
