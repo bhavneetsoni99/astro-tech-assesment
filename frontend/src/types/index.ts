@@ -15,7 +15,26 @@ export interface Player {
 }
 
 export interface Pitch {
-  // TODO: Add player properties that match your backend model
+  rowid: number;
+  pitch_type: string;
+  pitch_name: string;
+  release_speed: string;
+  type: string;
+  batter: number;
+  batter_details: {
+    first_name: string;
+    last_name: string;
+    team: string;
+  };
+  pitcher: number;
+  pitcher_details: {
+    first_name: string;
+    last_name: string;
+    team: string;
+  };
+  description: string;
+  events: string;
+  game_date: string;
 }
 
 export interface PlayerFilterOptions {
@@ -28,4 +47,28 @@ export interface PlayerFilterOptions {
 export interface TableRow {
   id: number | string;
   cells: string[];
+}
+
+export interface PitchFilterOptions {
+  release_speed?: string;
+  pitcher?: number;
+  pitching_team?: string;
+  batter?: number;
+  batting_team?: string;
+  pitch_name?: string;
+  next_cursor?: number | null;
+  limit?: number;
+}
+
+export interface PlayerInfo {
+  player_id: number;
+  first_name: string;
+  last_name: string;
+}
+
+export interface PitchesResponse {
+  pitches: Pitch[];
+  total_count: number;
+  next_cursor: number | null;
+  limit: number;
 }

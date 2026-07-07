@@ -303,6 +303,7 @@ Since we do not have any designs avaiable, I have tried to emulate [ESPNs Player
 13. Added React Router, for navigation links and nested routes.
 14. Added dedicated route level components for `players` and `pitches` subroutes
 15. Added `Pich` table with support for filtering and paginization
+16. Implement a dedicated `pitch filtering` controls for pitch type, pitcher, batter, team, and release speed.
 
 ### Code Organization
 
@@ -327,6 +328,7 @@ Tests were written alongside feature implementation, following the existing Vite
 11. Added unit test for `pitches`, `pitch_names` and `players` on the UI side
 12. Added unit tests for `App.tsx`
 13. Added unit tests for `PitchTable` component
+14. Added unit tests for `PitchFilterControls`
 
 #### E2E Tests Added:
 
