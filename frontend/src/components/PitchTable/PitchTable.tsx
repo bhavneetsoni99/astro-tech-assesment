@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ApiService from "../../services/api";
 import { PitchesResponse, PitchFilterOptions, TableRow } from "../../types";
 import { TableComponent } from "../TableComponent";
+import { useSort } from "../../utils";
 
 interface PitchTableProps {
   filters?: PitchFilterOptions;
@@ -22,7 +23,7 @@ export const PitchTable: React.FC<PitchTableProps> = ({
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
-  const { release_speed, pitcher, batter, pitch_name } = filters;
+  const { release_speed, pitcher, batter, pitch_name, pitching_team, batting_team } = filters;
   const { pitches, total_count, next_cursor } = pitchesResponse;
 
   const fetchPitches = useCallback((cursorValue?: number | null) => {
@@ -30,6 +31,8 @@ export const PitchTable: React.FC<PitchTableProps> = ({
     setError("");
     const queries = {
       pitch_name,
+      pitching_team, 
+      batting_team,
       ...(cursorValue && { next_cursor: cursorValue }),
       ...(release_speed && { release_speed }),
       ...(pitcher && { pitcher }),
@@ -49,7 +52,7 @@ export const PitchTable: React.FC<PitchTableProps> = ({
       }))
       .catch((err) => setError(err.message))
       .finally(() => setIsLoading(false));
-  }, [release_speed, pitcher, batter, pitch_name]);
+  }, [release_speed, pitcher, batter, pitch_name, pitching_team, batting_team]);
 
 
   useEffect(() => {
@@ -71,17 +74,23 @@ export const PitchTable: React.FC<PitchTableProps> = ({
     ]
   } as TableRow)), [pitches]);
 
+  const { sortConfig, handleSort, sortData } = useSort();
+  const sortedRows = useMemo(() => sortData(rows), [rows, sortData]);
+
   return (
     <TableComponent
       tableName="pitches"
       columns={PITCH_COLUMNS}
-      data={rows}
+      data={sortedRows}
       isLoading={isLoading}
       error={error}
       totalCount={total_count}
       hasMoreData={!!next_cursor}
       onLoadMore={() => fetchPitches(next_cursor)}
       onRowClick={(rowId) => navigate(`/pitch-details/${rowId}`)}
+      sortColumn={sortConfig.columnIndex}
+      sortDirection={sortConfig.direction}
+      onSort={handleSort}
     />
   );
 }

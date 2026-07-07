@@ -75,4 +75,86 @@ describe("TableComponent", () => {
     fireEvent.click(firstDataRow);
     expect(onRowClick).toHaveBeenCalledWith(1);
   });
+
+  describe("sorting", () => {
+    test("clicking a column header calls onSort with column index", () => {
+      const onSort = vi.fn();
+      render(
+        <TableComponent tableName="players" columns={mockColumns} data={mockData} onSort={onSort} />
+      );
+      fireEvent.click(screen.getByText("Team"));
+      expect(onSort).toHaveBeenCalledWith(1);
+    });
+
+    test("shows sort indicator on active sort column", () => {
+      const { container } = render(
+        <TableComponent
+          tableName="players"
+          columns={mockColumns}
+          data={mockData}
+          sortColumn={1}
+          sortDirection="asc"
+          onSort={vi.fn()}
+        />
+      );
+      const headerCells = container.querySelectorAll("th");
+      expect(headerCells[1].textContent).toContain("▲");
+    });
+
+    test("shows descending indicator when sort direction is desc", () => {
+      const { container } = render(
+        <TableComponent
+          tableName="players"
+          columns={mockColumns}
+          data={mockData}
+          sortColumn={1}
+          sortDirection="desc"
+          onSort={vi.fn()}
+        />
+      );
+      const headerCells = container.querySelectorAll("th");
+      expect(headerCells[1].textContent).toContain("▼");
+    });
+
+    test("sets aria-sort attribute on active column", () => {
+      render(
+        <TableComponent
+          tableName="players"
+          columns={mockColumns}
+          data={mockData}
+          sortColumn={1}
+          sortDirection="asc"
+          onSort={vi.fn()}
+        />
+      );
+      const headerCells = screen.getAllByRole("columnheader");
+      expect(headerCells[1]).toHaveAttribute("aria-sort", "ascending");
+    });
+
+    test("header is keyboard accessible with Enter key", () => {
+      const onSort = vi.fn();
+      render(
+        <TableComponent tableName="players" columns={mockColumns} data={mockData} onSort={onSort} />
+      );
+      const headerCells = screen.getAllByRole("columnheader");
+      fireEvent.keyDown(headerCells[0], { key: "Enter" });
+      expect(onSort).toHaveBeenCalledWith(0);
+    });
+
+    test("non-active column has no sort indicator", () => {
+      const { container } = render(
+        <TableComponent
+          tableName="players"
+          columns={mockColumns}
+          data={mockData}
+          sortColumn={0}
+          sortDirection="asc"
+          onSort={vi.fn()}
+        />
+      );
+      const headerCells = container.querySelectorAll("th");
+      expect(headerCells[1].textContent).not.toContain("▲");
+      expect(headerCells[1].textContent).not.toContain("▼");
+    });
+  });
 });

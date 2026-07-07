@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ApiService from "../../services/api";
 import { Player, PlayerFilterOptions, TableRow } from "../../types";
 import {TableComponent} from "../TableComponent";
-import { getAge } from "../../utils";
+import { getAge, useSort } from "../../utils";
 
 interface PlayerTableProps {
  filters?: PlayerFilterOptions;
@@ -38,18 +38,21 @@ export const PlayerTable: React.FC<PlayerTableProps> = ({
       player.primary_position,
       player.bats,
       player.throws,
-      getAge(player.birthdate),
+      String(getAge(player.birthdate)),
       `${player.height_feet}' ${player.height_inches}"`,
       `${player.weight} lbs`,
       `${player.birth_state === "NULL" ? "" : `${player.birth_state}, `}${player.birth_country}`
     ]
   } as TableRow)), [players]);
 
+  const { sortConfig, handleSort, sortData } = useSort();
+  const sortedRows = useMemo(() => sortData(rows), [rows, sortData]);
+
   return (
     <TableComponent
       tableName="players"
       columns={PLAYER_COLUMNS}
-      data={rows}
+      data={sortedRows}
       isLoading={isLoading}
       error={error}
       onRowClick={(rowId) => {
@@ -58,6 +61,9 @@ export const PlayerTable: React.FC<PlayerTableProps> = ({
           navigate(`/player-details/${rowId}`);
         }
       }}
+      sortColumn={sortConfig.columnIndex}
+      sortDirection={sortConfig.direction}
+      onSort={handleSort}
     />
   );
 };

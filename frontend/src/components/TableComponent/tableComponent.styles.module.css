@@ -52,6 +52,23 @@ th {
   z-index: 1;
 }
 
+.sortableHeader {
+  cursor: pointer;
+  user-select: none;
+}
+
+.sortableHeader:hover {
+  background-color: #e8e8e8;
+}
+
+.activeSort {
+  background-color: #e0e0e0;
+}
+
+.sortIndicator {
+  font-size: 0.75em;
+}
+
 
 tbody tr:hover {
   background-color: #f2f2f2;

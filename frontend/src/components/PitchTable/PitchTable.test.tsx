@@ -1,5 +1,5 @@
 import { describe, test, expect, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { PitchTable } from "./PitchTable";
 
 const mockNavigate = vi.fn();
@@ -143,6 +143,70 @@ describe("PitchTable", () => {
     await waitFor(() => {
       const rows = container.querySelectorAll("tbody tr");
       expect(rows).toHaveLength(2);
+    });
+  });
+
+  describe("sorting", () => {
+    test("renders sortable column headers", async () => {
+      mockGet.mockResolvedValue(mockPitchesResponse);
+
+      render(<PitchTable />);
+
+      await waitFor(() => {
+        const headers = screen.getAllByRole("columnheader");
+        headers.forEach((header) => {
+          expect(header).toHaveAttribute("tabindex", "0");
+        });
+      });
+    });
+
+    test("sorts by speed ascending when Speed column is clicked first", async () => {
+      mockGet.mockResolvedValue(mockPitchesResponse);
+
+      const { container } = render(<PitchTable />);
+
+      await waitFor(() => {
+        expect(screen.getByText("Slider")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByText("Speed"));
+
+      const speedCells = container.querySelectorAll("tbody tr td:nth-child(4)");
+      expect(speedCells[0].textContent).toBe("88.1");
+      expect(speedCells[1].textContent).toBe("95.2");
+    });
+
+    test("sorts by pitch type ascending when Type column is clicked", async () => {
+      mockGet.mockResolvedValue(mockPitchesResponse);
+
+      const { container } = render(<PitchTable />);
+
+      await waitFor(() => {
+        expect(screen.getByText("Slider")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByText("Type"));
+
+      const rows = container.querySelectorAll("tbody tr td:nth-child(3)");
+      expect(rows[0].textContent).toBe("Fastball");
+      expect(rows[1].textContent).toBe("Slider");
+    });
+
+    test("sorts by pitch type descending when Type column is clicked twice", async () => {
+      mockGet.mockResolvedValue(mockPitchesResponse);
+
+      const { container } = render(<PitchTable />);
+
+      await waitFor(() => {
+        expect(screen.getByText("Slider")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByText("Type"));
+      fireEvent.click(screen.getByText("Type"));
+
+      const rows = container.querySelectorAll("tbody tr td:nth-child(3)");
+      expect(rows[0].textContent).toBe("Slider");
+      expect(rows[1].textContent).toBe("Fastball");
     });
   });
 });

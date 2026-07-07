@@ -2,6 +2,7 @@ import React, { memo } from "react";
 import { LoadingSpinner } from "../LoadingSpinner";
 import styles from "./tableComponent.styles.module.css";
 import { TableRow } from "../../types";
+import type { SortDirection } from "../../utils";
 
 interface TableProps {
   tableName: 'players' | 'pitches';
@@ -13,6 +14,9 @@ interface TableProps {
   error?: string;
   onRowClick?: (rowId: number | string) => void;
   onLoadMore?: () => void;
+  sortColumn?: number | null;
+  sortDirection?: SortDirection;
+  onSort?: (columnIndex: number) => void;
 }
 
 export const TableComponent: React.FC<TableProps> = memo(({
@@ -25,6 +29,9 @@ export const TableComponent: React.FC<TableProps> = memo(({
   error,
   onRowClick,
   onLoadMore = () => { },
+  sortColumn = null,
+  sortDirection = null,
+  onSort,
 }) => {
 
   const hasData = data.length > 0;
@@ -65,8 +72,27 @@ export const TableComponent: React.FC<TableProps> = memo(({
         <table aria-labelledby="table-heading">
           <thead>
             <tr>
-              {columns.map((column) => (
-                <th key={column} scope="col">{column}</th>
+              {columns.map((column, index) => (
+                <th
+                  key={column}
+                  scope="col"
+                  className={`${styles.sortableHeader} ${sortColumn === index ? styles.activeSort : ""}`}
+                  onClick={() => onSort?.(index)}
+                  onKeyDown={(e) => e.key === "Enter" && onSort?.(index)}
+                  tabIndex={onSort ? 0 : undefined}
+                  aria-sort={
+                    sortColumn === index
+                      ? sortDirection === "asc" ? "ascending" : "descending"
+                      : undefined
+                  }
+                >
+                  {column}
+                  {sortColumn === index && (
+                    <span className={styles.sortIndicator}>
+                      {sortDirection === "asc" ? " ▲" : " ▼"}
+                    </span>
+                  )}
+                </th>
               ))}
             </tr>
           </thead>

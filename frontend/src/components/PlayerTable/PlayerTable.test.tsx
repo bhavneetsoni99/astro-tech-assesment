@@ -1,5 +1,6 @@
 import { describe, test, expect, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import { Player } from "../../types";
 import { PlayerTable } from "./PlayerTable";
 
@@ -19,8 +20,9 @@ vi.mock("axios", () => ({
   },
 }));
 
-vi.mock("../../utils", () => ({
+vi.mock("../../utils", async () => ({
   getAge: vi.fn(() => 25),
+  useSort: (await vi.importActual("../../utils")).useSort,
 }));
 
 const mockPlayers: Player[] = [
