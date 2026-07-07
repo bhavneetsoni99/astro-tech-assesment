@@ -301,6 +301,7 @@ Since we do not have any designs avaiable, I have tried to emulate [ESPNs Player
 11. Implemented `pitches`, `pitch_names` and `player_names` apis on the FE
 12. Showing both `Pitch` and `Player` tables in the same page was getting cluttered and would have bad user experience on smaller view ports, Added client-side routing to the frontend so the dashboard can render dedicated player and pitch experiences from a shared shell.
 13. Added React Router, for navigation links and nested routes.
+14. Added dedicated route level components for `players` and `pitches` subroutes
 
 ### Code Organization
 
