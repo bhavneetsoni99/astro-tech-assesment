@@ -1,10 +1,35 @@
+.tableComponent {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 .tableContainer {
   position: relative;
-  overflow-x: auto;
-  height: 200px;
-  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
+}
+
+.tableHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+}
+
+.tableHeading h2 {
+  flex: 1;
+  margin: 0;
+  margin-bottom: .75rem;
+}
+
+.dataInfo {
+  display: flex;
+  gap: 1rem;
 }
 
 table {
@@ -58,6 +83,6 @@ tbody tr:hover {
   font-style: italic;
 }
 
-.clickebleRow {
+.clickable {
   cursor: pointer;
 }
