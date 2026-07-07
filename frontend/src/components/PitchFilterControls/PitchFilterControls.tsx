@@ -101,6 +101,24 @@ const PitchFilterControls: React.FC<PitchFilterControlsProps> = ({
             </select>
           </div>
           <div className={styles.filterGroup}>
+            <label htmlFor="batting-team-filter">Batting Team</label>
+            <select
+              id="batting-team-filter"
+              value={filters.batting_team || ""}
+              onChange={(event) =>
+                onFilterChange((prev: PitchFilterOptions) => ({
+                  ...prev,
+                  batting_team: event.target.value || undefined
+                }))
+              }
+            >
+              <option value="">All Teams</option>
+              {availableTeams.map((team) => (
+                <option key={team} value={team}>{team}</option>
+              ))}
+            </select>
+          </div>
+          <div className={styles.filterGroup}>
             <label htmlFor="speed-filter">Speed</label>
             <input
               type="text"
