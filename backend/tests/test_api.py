@@ -5,7 +5,9 @@ from pathlib import Path
 os.environ["RUNNING_BASEBALL_TESTS"] = "TRUE"
 
 import pytest
-from main import app, db, Player, Pitch
+from main import app
+from app import db
+from app.models import Player, Pitch
 
 @pytest.fixture(scope="function")
 def client():
@@ -115,7 +117,7 @@ class TestHealthCheck:
 
     def test_health_check(self, client):
         """Test that health check returns 200 status."""
-        response = client.get("/health")
+        response = client.get("/api/v1/health")
         assert response.status_code == 200
         assert response.get_json() == {"status": "healthy"}
 
@@ -125,7 +127,7 @@ class TestPlayerAPI:
 
     def test_get_all_players(self, client):
         """Test getting all players."""
-        response = client.get("/players")
+        response = client.get("/api/v1/players")
         assert response.status_code == 200
         data = response.get_json()
         assert len(data) == 3
@@ -135,7 +137,7 @@ class TestPlayerAPI:
 
     def test_filter_players_by_team(self, client):
         """Test filtering players by team."""
-        response = client.get("/players?team=TOR")
+        response = client.get("/api/v1/players?team=TOR")
         assert response.status_code == 200
         data = response.get_json()
         assert len(data) == 1
@@ -144,7 +146,7 @@ class TestPlayerAPI:
 
     def test_filter_players_by_position(self, client):
         """Test filtering players by position."""
-        response = client.get("/players?position=LHS")
+        response = client.get("/api/v1/players?position=LHS")
         assert response.status_code == 200
         data = response.get_json()
         assert len(data) == 1
@@ -152,7 +154,7 @@ class TestPlayerAPI:
 
     def test_filter_players_by_team_and_position(self, client):
         """Test filtering players by both team and position."""
-        response = client.get("/players?team=SD&position=RHS")
+        response = client.get("/api/v1/players?team=SD&position=RHS")
         assert response.status_code == 200
         data = response.get_json()
         assert len(data) == 1
@@ -160,14 +162,14 @@ class TestPlayerAPI:
 
     def test_filter_no_matches(self, client):
         """Test filtering with no matching results."""
-        response = client.get("/players?team=XYZ")
+        response = client.get("/api/v1/players?team=XYZ")
         assert response.status_code == 200
         data = response.get_json()
         assert data == []
 
     def test_get_player_by_id(self, client):
         """Test getting a specific player by ID."""
-        response = client.get("/players/453286")
+        response = client.get("/api/v1/players/453286")
         assert response.status_code == 200
         data = response.get_json()
         assert data["first_name"] == "Maxwell"
@@ -176,7 +178,7 @@ class TestPlayerAPI:
 
     def test_get_nonexistent_player(self, client):
         """Test getting a player that doesn't exist."""
-        response = client.get("/players/1")
+        response = client.get("/api/v1/players/1")
         assert response.status_code == 404
         data = response.get_json()
         assert "error" in data
@@ -187,7 +189,7 @@ class TestTeamsAPI:
 
     def test_get_teams(self, client):
         """Test getting all distinct teams sorted alphabetically."""
-        response = client.get("/teams")
+        response = client.get("/api/v1/teams")
         assert response.status_code == 200
         data = response.get_json()
         assert data == ["LAD", "SD", "TOR"]
@@ -197,7 +199,7 @@ class TestPositionsAPI:
 
     def test_get_positions(self, client):
         """Test getting all distinct positions sorted alphabetically."""
-        response = client.get("/positions")
+        response = client.get("/api/v1/positions")
         assert response.status_code == 200
         data = response.get_json()
         assert data == ["LHS", "RHS"]
@@ -207,7 +209,7 @@ class TestPitchesAPI:
 
     def test_get_pitches_returns_all_pitches(self, client):
         """Test that the pitches endpoint returns the expected payload structure."""
-        response = client.get("/pitches")
+        response = client.get("/api/v1/pitches")
         assert response.status_code == 200
 
         data = response.get_json()
@@ -219,7 +221,7 @@ class TestPitchesAPI:
 
     def test_get_pitches_filters_by_pitcher(self, client):
         """Test filtering pitches by pitcher ID."""
-        response = client.get("/pitches?pitcher=453286")
+        response = client.get("/api/v1/pitches?pitcher=453286")
         assert response.status_code == 200
 
         data = response.get_json()
@@ -229,7 +231,7 @@ class TestPitchesAPI:
 
     def test_get_pitches_filters_by_pitch_name(self, client):
         """Test filtering pitches by pitch name."""
-        response = client.get("/pitches?pitch_name=Fastball")
+        response = client.get("/api/v1/pitches?pitch_name=Fastball")
         assert response.status_code == 200
 
         data = response.get_json()
@@ -238,7 +240,7 @@ class TestPitchesAPI:
 
     def test_get_pitches_filters_by_release_speed(self, client):
         """Test filtering pitches by a minimum release speed."""
-        response = client.get("/pitches?release_speed=90")
+        response = client.get("/api/v1/pitches?release_speed=90")
         assert response.status_code == 200
 
         data = response.get_json()
@@ -251,7 +253,7 @@ class TestPitchNamesAPI:
 
     def test_get_pitch_names(self, client):
         """Test getting all distinct pitch names sorted alphabetically."""
-        response = client.get("/pitch_names")
+        response = client.get("/api/v1/pitch_names")
         assert response.status_code == 200
         data = response.get_json()
         assert data == ["Fastball", "Slider"]
@@ -262,7 +264,7 @@ class TestPlayersListAPI:
 
     def test_get_players_list(self, client):
         """Test getting all players with their IDs, first and last names."""
-        response = client.get("/players_list")
+        response = client.get("/api/v1/players_list")
         assert response.status_code == 200
         data = response.get_json()
         assert len(data) == 3

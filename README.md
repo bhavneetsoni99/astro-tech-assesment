@@ -309,6 +309,87 @@ Since we do not have any designs avaiable, I have tried to emulate [ESPNs Player
 
 I have tried to colocate test and style files within the component folders. All components live in Component Directories under `src/components/`, utility functions in `src/utils/`
 
+Backend App Tree
+app
+├── config.py
+├── **init**.py
+├── models
+│   ├── **init**.py
+│   ├── pitches.py
+│   └── players.py
+├── routes
+│   ├── health.py
+│   ├── **init**.py
+│   ├── pitches.py
+│   └── players.py 
+└── schemas
+├── **init**.py
+├── pitches.py
+└── players.py
+
+Frontend Tree
+.
+├── App.test.tsx
+├── App.tsx
+├── assets
+│   └── astros.png
+├── components
+│   ├── LoadingSpinner
+│   │   ├── index.ts
+│   │   ├── loadingSpinner.styles.module.css
+│   │   └── LoadingSpinner.tsx
+│   ├── Pitches
+│   │   ├── index.ts
+│   │   └── PitchesComponent.tsx
+│   ├── PitchFilterControls
+│   │   ├── index.ts
+│   │   ├── pitchFilterControls.styles.module.css
+│   │   ├── PitchFilterControls.test.tsx
+│   │   ├── PitchFilterControls.tsx
+│   │   └── PitchFilterWrapper.tsx
+│   ├── PitchTable
+│   │   ├── index.ts
+│   │   ├── pitchTable.styles.module.css
+│   │   ├── PitchTable.test.tsx
+│   │   └── PitchTable.tsx
+│   ├── PlayerFilterControls
+│   │   ├── index.ts
+│   │   ├── playerFilterControls.styles.module.css
+│   │   ├── PlayerFilterControls.test.tsx
+│   │   ├── PlayerFilterControls.tsx
+│   │   └── PlayerFilterWrapper.tsx
+│   ├── Players
+│   │   ├── index.ts
+│   │   └── PlayersComponent.tsx
+│   ├── PlayerTable
+│   │   ├── index.ts
+│   │   ├── playerTable.styles.module.css
+│   │   ├── PlayerTable.test.tsx
+│   │   └── PlayerTable.tsx
+│   └── TableComponent
+│   ├── index.ts
+│   ├── tableComponent.styles.module.css
+│   ├── TableComponent.test.tsx
+│   └── TableComponent.tsx
+├── index.css
+├── index.tsx
+├── services
+│   ├── api.test.ts
+│   └── api.ts
+├── setupTests.ts
+├── styles
+│   ├── filter.styles.module.css
+│   ├── global.css
+│   └── styles.module.css
+├── types
+│   └── index.ts
+├── utils
+│   ├── index.ts
+│   ├── useSort.ts
+│   ├── utils.test.ts
+│   └── utils.ts
+└── vite-env.d.ts
+
 ### Testing Approach
 
 Tests were written alongside feature implementation, following the existing Vitest + React Testing Library pattern in the Frontend project and Backend project. I used the product requirements to define minimal viable product test cases and expand from there. Continuing to add unit as I build helps me stay on track and ensures new changes don’t break existing functionality. I believe its more important to test for edge cases than Happy paths. If time permits I will try to add E2E tests lateer on.
