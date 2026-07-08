@@ -56,6 +56,33 @@
   }
 }
 
+@media (max-width: 768px) {
+  .App {
+    height: auto;
+    min-height: 100vh;
+    padding: 0.5rem;
+
+    header h1 {
+      font-size: 1.25rem;
+    }
+
+    nav {
+      gap: 0.5rem;
+      flex-wrap: wrap;
+
+      a {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.75rem;
+      }
+    }
+  }
+
+  .filterSection {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
 .filterSection {
   display: flex;
   justify-content: space-between;

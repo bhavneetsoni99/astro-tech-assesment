@@ -14,6 +14,12 @@
   border-radius: 4px;
 }
 
+@media (min-width: 769px) {
+  table {
+    table-layout: fixed;
+  }
+}
+
 .tableHeading {
   display: flex;
   align-items: center;
@@ -102,4 +108,43 @@ tbody tr:hover {
 
 .clickable {
   cursor: pointer;
+}
+
+.loadMoreBottom {
+  display: none;
+  justify-content: center;
+  padding: 1rem;
+}
+
+@media (max-width: 768px) {
+  .dataInfo button {
+    display: none;
+  }
+
+  .loadMoreBottom {
+    display: flex;
+  }
+
+  .tableComponent {
+    flex: initial;
+    min-height: initial;
+  }
+
+  .tableContainer {
+    flex: initial;
+    min-height: initial;
+    overflow: visible;
+  }
+
+  table {
+    width: auto;
+    min-width: 100%;
+  }
+
+  th,
+  td {
+    padding: 6px 8px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
 }

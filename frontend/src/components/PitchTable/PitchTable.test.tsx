@@ -1,5 +1,6 @@
 import { describe, test, expect, vi } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import { PitchTable } from "./PitchTable";
 
 const mockNavigate = vi.fn();
@@ -99,7 +100,7 @@ describe("PitchTable", () => {
     expect(screen.getByText("Shohei Ohtani")).toBeInTheDocument();
     expect(screen.getByText("Fastball")).toBeInTheDocument();
     expect(screen.getByText("Slider")).toBeInTheDocument();
-    expect(screen.getByText("called_strike")).toBeInTheDocument();
+    expect(screen.getByText("Called Strike")).toBeInTheDocument();
   });
 
   test("shows error state when API call fails", async () => {

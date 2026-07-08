@@ -118,6 +118,17 @@ export const TableComponent: React.FC<TableProps> = memo(({
           )}
         </table>
       </div>
+      {hasMoreData && (
+        <div className={styles.loadMoreBottom}>
+          <button role="button"
+            className={styles.clickable}
+            onClick={onLoadMore}
+            onKeyDown={(e) => e.key === 'Enter' && onLoadMore()}
+          >
+            Load More
+          </button>
+        </div>
+      )}
     </div>
   );
 });

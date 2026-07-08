@@ -60,7 +60,16 @@ export const PitchTable: React.FC<PitchTableProps> = ({
     fetchPitches();
   }, [fetchPitches]);
 
-  const rows = useMemo(() => pitches.map((pitch) => ({
+  const formatGameDate = (dateStr: string) => {
+  const [y, m, d] = dateStr.split("-");
+  const date = new Date(Number(y), Number(m) - 1, Number(d));
+  return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+};
+
+const formatDescription = (desc: string) =>
+  desc.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+const rows = useMemo(() => pitches.map((pitch) => ({
     id: pitch.rowid,
     cells: [
       `${pitch.pitcher_details.first_name} ${pitch.pitcher_details.last_name}`,
@@ -69,8 +78,8 @@ export const PitchTable: React.FC<PitchTableProps> = ({
       pitch.release_speed,
       `${pitch.batter_details.first_name} ${pitch.batter_details.last_name}`,
       pitch.batter_details.team,
-      pitch.description,
-      new Date(pitch.game_date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }),
+      formatDescription(pitch.description),
+      formatGameDate(pitch.game_date),
     ]
   } as TableRow)), [pitches]);
 

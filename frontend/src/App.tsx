@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./styles/styles.module.css";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, type NavLinkRenderProps } from "react-router-dom";
 
 const App: React.FC = () => {
   return (
@@ -11,10 +11,10 @@ const App: React.FC = () => {
       </header>
       <nav>
         <NavLink to="players"
-          className={({ isActive }) => isActive ? styles.active : undefined}>
+          className={({ isActive }: NavLinkRenderProps) => isActive ? styles.active : undefined}>
           Players</NavLink>
         <NavLink to="pitches"
-          className={({ isActive }) => isActive ? styles.active : undefined}>
+          className={({ isActive }: NavLinkRenderProps) => isActive ? styles.active : undefined}>
         Pitches</NavLink>
       </nav>
 

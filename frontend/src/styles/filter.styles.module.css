@@ -29,3 +29,16 @@ fieldset legend {
   margin-bottom: 0.5rem;
   text-align: right;
 }
+
+@media (max-width: 768px) {
+  .filterRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filterGroup select,
+  .filterGroup input,
+  .clearFilters {
+    width: 100%;
+  }
+}
