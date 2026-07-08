@@ -1,9 +1,13 @@
+.filterControls{
+  width: 100%
+}
 .filterRow {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   align-items: flex-end;
   text-align: left;
+  justify-content: space-between;
 }
 
 .filterGroup {
@@ -23,4 +27,5 @@
 fieldset legend {
   font-weight: bold;
   margin-bottom: 0.5rem;
+  text-align: right;
 }
