@@ -414,3 +414,11 @@ Tests were written alongside feature implementation, following the existing Vite
 #### E2E Tests Added:
 
 ### Additional Improvements/Proposed Improvements
+
+1. Implement a responsive Dynamic table using `Tanstack library (@tanstack/react-virtual)` Library uses `virtualization` techniques to improve applications performance by rendering only the data that is visible on screen.
+
+2. Use CSS Libraries such as `BootStrap` of `Tailwind` to improve the look and feel of the project.
+
+3. Build out `Player Detail` and `Pitch Detail` pages with more data visualizations
+
+I put more effort on showcasing what I can do instead of what Libraries i can implement.
