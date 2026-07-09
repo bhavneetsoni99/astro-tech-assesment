@@ -2,11 +2,16 @@ from flask import request, jsonify
 from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload, aliased
 from app import db
+from app.errors import ApiError
 from app.routes import api_bp
 from app.models import Player, Pitch
 from app.schemas import PitchSchema
 
 pitches_schema = PitchSchema(many=True)
+
+MAX_LIMIT = 1000
+MIN_LIMIT = 1
+
 
 @api_bp.route("/pitches", methods=["GET"])
 def get_pitches():
@@ -24,31 +29,43 @@ def get_pitches():
     limit = request.args.get("limit", default=500, type=int)
     cursor = request.args.get("next_cursor", default=None, type=int)
 
+    if limit < MIN_LIMIT or limit > MAX_LIMIT:
+        raise ApiError(400, f"Limit must be between {MIN_LIMIT} and {MAX_LIMIT}")
+
+    pitcher_int: int | None = None
+    if pitcher_arg:
+        try:
+            pitcher_int = int(pitcher_arg)
+        except ValueError:
+            raise ApiError(400, f"Invalid pitcher id '{pitcher_arg}'")
+
+    batter_int: int | None = None
+    if batter_arg:
+        try:
+            batter_int = int(batter_arg)
+        except ValueError:
+            raise ApiError(400, f"Invalid batter id '{batter_arg}'")
+
+    speed_val: float | None = None
+    if release_speed_arg:
+        try:
+            speed_val = float(release_speed_arg)
+        except ValueError:
+            raise ApiError(400, f"Invalid release_speed value '{release_speed_arg}'")
+
     Pitcher = aliased(Player)
     Batter = aliased(Player)
 
     select_pitches = select(Pitch)
 
-    if pitcher_arg:
-        try:
-            pitcher_int = int(pitcher_arg)
-            select_pitches = select_pitches.where(Pitch.pitcher == pitcher_int)
-        except ValueError:
-            pass
+    if pitcher_int is not None:
+        select_pitches = select_pitches.where(Pitch.pitcher == pitcher_int)
 
-    if batter_arg:
-        try:
-            batter_int = int(batter_arg)
-            select_pitches = select_pitches.where(Pitch.batter == batter_int)
-        except ValueError:
-            pass
+    if batter_int is not None:
+        select_pitches = select_pitches.where(Pitch.batter == batter_int)
 
-    if release_speed_arg:
-        try:
-            speed_val = float(release_speed_arg)
-            select_pitches = select_pitches.where(Pitch.release_speed >= speed_val)
-        except ValueError:
-            pass
+    if speed_val is not None:
+        select_pitches = select_pitches.where(Pitch.release_speed >= speed_val)
 
     if pitch_name_arg:
         select_pitches = select_pitches.where(Pitch.pitch_name == pitch_name_arg)
@@ -79,7 +96,7 @@ def get_pitches():
     pitches = db.session.scalars(
         paginated_query.options(
             joinedload(getattr(Pitch, "pitcher_details")),
-            joinedload(getattr(Pitch, "batter_details"))
+            joinedload(getattr(Pitch, "batter_details")),
         )
     ).all()
 
@@ -87,16 +104,21 @@ def get_pitches():
 
     result = pitches_schema.dump(pitches)
 
-    return jsonify({
-        "pitches": result,
-        "total_count": total_count,
-        "next_cursor": next_cursor,
-        "limit": limit
-    }), 200
+    return jsonify(
+        {
+            "pitches": result,
+            "total_count": total_count,
+            "next_cursor": next_cursor,
+            "limit": limit,
+        }
+    ), 200
+
 
 @api_bp.route("/pitch_names", methods=["GET"])
 def get_pitch_names():
     """Get all distinct pitch names sorted alphabetically."""
-    select_pitch_names = select(Pitch.pitch_name).distinct().order_by(Pitch.pitch_name.asc())
+    select_pitch_names = (
+        select(Pitch.pitch_name).distinct().order_by(Pitch.pitch_name.asc())
+    )
     pitch_names = db.session.execute(select_pitch_names).scalars().all()
     return jsonify(pitch_names), 200

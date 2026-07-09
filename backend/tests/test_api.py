@@ -119,7 +119,9 @@ class TestHealthCheck:
         """Test that health check returns 200 status."""
         response = client.get("/api/v1/health")
         assert response.status_code == 200
-        assert response.get_json() == {"status": "healthy"}
+        data = response.get_json()
+        assert data["status"] == "healthy"
+        assert data["database"] == "connected"
 
 
 class TestPlayerAPI:
