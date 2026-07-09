@@ -72,3 +72,8 @@ export interface PitchesResponse {
   next_cursor: number | null;
   limit: number;
 }
+
+export interface ApiErrorResponse {
+  message: string;
+  status: number;
+}

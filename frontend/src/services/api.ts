@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Player, PlayerFilterOptions, PlayerInfo, PitchFilterOptions, PitchesResponse } from "../types";
+import { Player, PlayerFilterOptions, PlayerInfo, PitchFilterOptions, PitchesResponse, type ApiErrorResponse } from "../types";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
@@ -9,6 +9,15 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const message = error.response?.data?.error || error.message || "An unexpected error occurred";
+    const status = error.response?.status || 0;
+    return Promise.reject({ message, status } satisfies ApiErrorResponse);
+  }
+);
 
 export class ApiService {
   /**
