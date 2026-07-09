@@ -142,7 +142,7 @@ tbody tr:hover {
   .tableContainer {
     flex: initial;
     min-height: initial;
-    overflow: visible;
+    overflow: auto;
   }
 
   .tableHeading {
@@ -154,6 +154,7 @@ tbody tr:hover {
 
   table {
     min-width: 100%;
+    width:auto;
   }
 
   th,

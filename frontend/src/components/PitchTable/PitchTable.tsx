@@ -9,9 +9,9 @@ interface PitchTableProps {
   filters?: PitchFilterOptions;
 }
 
-const PITCH_COLUMNS = [['Pitcher', 'colFlex'], ['P.Team', 'colSmall'], 
-['Type', 'colMedium'], ['Spd', 'colSmall'], ['Batter', 'colFlex'],
- ['B.Team', 'colSmall'], ['Res', 'colMedium'], ['Date', 'colFlex']]
+const PITCH_COLUMNS = [['Pitcher', 'colFlex'], ['P.Team', 'colFlex'], 
+['Type', 'colFlex'], ['Spd', 'colSmall'], ['Batter', 'colFlex'],
+ ['B.Team', 'colFlex'], ['Res', 'colFlex'], ['Date', 'colFlex']]
 const DEFAULT_LIMIT = 50;
 export const PitchTable: React.FC<PitchTableProps> = ({
   filters = {},
