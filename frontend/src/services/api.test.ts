@@ -7,6 +7,9 @@ vi.mock("axios", () => ({
   default: {
     create: vi.fn(() => ({
       get: mockGet,
+      interceptors: {
+        response: { use: vi.fn() },
+      },
     })),
   },
 }));
