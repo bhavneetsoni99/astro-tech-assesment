@@ -67,11 +67,11 @@ describe("PlayerTable integration", () => {
     expect(container.querySelector('[class*="loadingOverlay"]')).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(screen.getByText("Maxwell Scherzer")).toBeInTheDocument();
+      expect(screen.getByText("M. Scherzer")).toBeInTheDocument();
     });
 
     expect(container.querySelector('[class*="loadingOverlay"]')).not.toBeInTheDocument();
-    expect(screen.getByText("Yu Darvish")).toBeInTheDocument();
+    expect(screen.getByText("Y. Darvish")).toBeInTheDocument();
     expect(screen.getByText("2 Players")).toBeInTheDocument();
   });
 
@@ -80,9 +80,12 @@ describe("PlayerTable integration", () => {
 
     render(<PlayerTable />);
 
-    const headers = ["Name", "Team", "Position", "Bats", "Throws", "Age", "Height", "Weight", "Birth Place"];
+    const headers = [['Name', 'colFlex'], ['Team', 'colSmall'],
+ ['Pos', 'colSmall'], ['Bat', 'colSmall'], ['Thw', 'colSmall'], 
+ ['Age', 'colSmall'], ['Ht', 'colSmall'], ['Wt', 'colMedium'], 
+ ['Birth Place', 'colFlex']];
     await waitFor(() => {
-      headers.forEach((header) => {
+      headers.forEach(([header]) => {
         expect(screen.getByText(header)).toBeInTheDocument();
       });
     });
@@ -98,7 +101,7 @@ describe("PlayerTable integration", () => {
     });
 
     expect(screen.getByTestId("row-506433")).toBeInTheDocument();
-    expect(screen.getByText("Maxwell Scherzer")).toBeInTheDocument();
+    expect(screen.getByText("M. Scherzer")).toBeInTheDocument();
     expect(screen.getByText("TOR")).toBeInTheDocument();
     expect(screen.getAllByText("RHS")).toHaveLength(2);
     expect(screen.getByText("MO, USA")).toBeInTheDocument();

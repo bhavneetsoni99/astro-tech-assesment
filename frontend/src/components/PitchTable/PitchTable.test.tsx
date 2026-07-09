@@ -66,10 +66,10 @@ describe("PitchTable", () => {
     expect(spinnerOverlay).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(screen.getByText("Yu Darvish")).toBeInTheDocument();
+      expect(screen.getByText("Y. Darvish")).toBeInTheDocument();
     });
 
-    expect(screen.getByText("Shohei Ohtani")).toBeInTheDocument();
+    expect(screen.getByText("S. Ohtani")).toBeInTheDocument();
     expect(screen.getByText("2 Pitches")).toBeInTheDocument();
   });
 
@@ -78,7 +78,7 @@ describe("PitchTable", () => {
 
     render(<PitchTable />);
 
-    const headers = ["Pitcher", "Team(P)", "Type", "Speed", "Batter", "Team(B)", "Result", "Date"];
+    const headers = ["Pitcher", "P.Team", "Type", "Spd", "Batter", "B.Team", "Res", "Date"];
     await waitFor(() => {
       headers.forEach((header) => {
         expect(screen.getByText(header)).toBeInTheDocument();
@@ -96,8 +96,8 @@ describe("PitchTable", () => {
     });
 
     expect(screen.getByTestId("row-2")).toBeInTheDocument();
-    expect(screen.getByText("Yu Darvish")).toBeInTheDocument();
-    expect(screen.getByText("Shohei Ohtani")).toBeInTheDocument();
+    expect(screen.getByText("Y. Darvish")).toBeInTheDocument();
+    expect(screen.getByText("S. Ohtani")).toBeInTheDocument();
     expect(screen.getByText("Fastball")).toBeInTheDocument();
     expect(screen.getByText("Slider")).toBeInTheDocument();
     expect(screen.getByText("Called Strike")).toBeInTheDocument();
@@ -170,7 +170,7 @@ describe("PitchTable", () => {
         expect(screen.getByText("Slider")).toBeInTheDocument();
       });
 
-      fireEvent.click(screen.getByText("Speed"));
+      fireEvent.click(screen.getByText("Spd"));
 
       const speedCells = container.querySelectorAll("tbody tr td:nth-child(4)");
       expect(speedCells[0].textContent).toBe("88.1");

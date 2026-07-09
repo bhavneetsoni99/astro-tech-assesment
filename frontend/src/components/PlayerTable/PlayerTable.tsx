@@ -9,7 +9,10 @@ interface PlayerTableProps {
  filters?: PlayerFilterOptions;
 }
 
-const PLAYER_COLUMNS = ['Name', 'Team', 'Position', 'Bats', 'Throws', 'Age', 'Height', 'Weight', 'Birth Place']
+const PLAYER_COLUMNS = [['Name', 'colFlex'], ['Team', 'colSmall'],
+ ['Pos', 'colSmall'], ['Bat', 'colSmall'], ['Thw', 'colSmall'], 
+ ['Age', 'colSmall'], ['Ht', 'colSmall'], ['Wt', 'colMedium'], 
+ ['Birth Place', 'colFlex']]
 
 export const PlayerTable: React.FC<PlayerTableProps> = ({
   filters = {},
@@ -33,7 +36,7 @@ export const PlayerTable: React.FC<PlayerTableProps> = ({
   const rows = useMemo(() => players.map((player) => ({
     id: player.player_id,
     cells: [
-      player.first_name + " " + player.last_name,
+      `${player.first_name?.charAt(0)}. ${player.last_name}`,
       player.team,
       player.primary_position,
       player.bats,

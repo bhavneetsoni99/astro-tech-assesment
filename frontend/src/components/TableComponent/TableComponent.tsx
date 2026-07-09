@@ -6,7 +6,7 @@ import type { SortDirection } from "../../utils";
 
 interface TableProps {
   tableName: 'players' | 'pitches';
-  columns: string[];
+  columns: string[][];
   data: TableRow[];
   totalCount?: number;
   hasMoreData?: boolean;
@@ -72,11 +72,13 @@ export const TableComponent: React.FC<TableProps> = memo(({
         <table aria-labelledby="table-heading">
           <thead>
             <tr>
-              {columns.map((column, index) => (
+              {columns.map(([column, cName], index) => (
                 <th
                   key={column}
                   scope="col"
-                  className={`${styles.sortableHeader} ${sortColumn === index ? styles.activeSort : ""}`}
+                  className={`${styles.sortableHeader} 
+                  ${sortColumn === index ? styles.activeSort : ""}
+                  ${styles[cName]}`}
                   onClick={() => onSort?.(index)}
                   onKeyDown={(e) => e.key === "Enter" && onSort?.(index)}
                   tabIndex={onSort ? 0 : undefined}
@@ -110,7 +112,7 @@ export const TableComponent: React.FC<TableProps> = memo(({
                   })}
                 >
                   {row.cells.map((cell, cellIndex) => (
-                    <td key={columns[cellIndex]}>{cell}</td>
+                    <td key={columns[cellIndex][0]}>{cell}</td>
                   ))}
                 </tr>
               ))}

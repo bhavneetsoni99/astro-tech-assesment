@@ -9,7 +9,9 @@ interface PitchTableProps {
   filters?: PitchFilterOptions;
 }
 
-const PITCH_COLUMNS = ['Pitcher','Team(P)', 'Type', 'Speed', 'Batter','Team(B)', 'Result', 'Date']
+const PITCH_COLUMNS = [['Pitcher', 'colFlex'], ['P.Team', 'colSmall'], 
+['Type', 'colMedium'], ['Spd', 'colSmall'], ['Batter', 'colFlex'],
+ ['B.Team', 'colSmall'], ['Res', 'colMedium'], ['Date', 'colFlex']]
 const DEFAULT_LIMIT = 50;
 export const PitchTable: React.FC<PitchTableProps> = ({
   filters = {},
@@ -72,11 +74,11 @@ const formatDescription = (desc: string) =>
 const rows = useMemo(() => pitches.map((pitch) => ({
     id: pitch.rowid,
     cells: [
-      `${pitch.pitcher_details.first_name} ${pitch.pitcher_details.last_name}`,
+      `${pitch.pitcher_details.first_name?.charAt(0)}. ${pitch.pitcher_details.last_name}`,
       pitch.pitcher_details.team,
       pitch.pitch_name,
       pitch.release_speed,
-      `${pitch.batter_details.first_name} ${pitch.batter_details.last_name}`,
+      `${pitch.batter_details.first_name?.charAt(0)}. ${pitch.batter_details.last_name}`,
       pitch.batter_details.team,
       formatDescription(pitch.description),
       formatGameDate(pitch.game_date),

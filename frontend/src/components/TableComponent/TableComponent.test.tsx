@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { TableComponent } from "./TableComponent";
 import { TableRow } from "../../types";
 
-const mockColumns = ["Name", "Team", "Position"];
+const mockColumns = [["Name",'a'], ["Team", 'b'], ["Position", 'c']];
 const mockData: TableRow[] = [
   { id: 1, cells: ["Player A", "TOR", "RHS"] },
   { id: 2, cells: ["Player B", "SD", "LHS"] },
@@ -14,7 +14,7 @@ describe("TableComponent", () => {
     render(
       <TableComponent tableName="players" columns={mockColumns} data={mockData} />
     );
-    mockColumns.forEach((header) => {
+    mockColumns.forEach(([header]) => {
       expect(screen.getByText(header)).toBeInTheDocument();
     });
   });

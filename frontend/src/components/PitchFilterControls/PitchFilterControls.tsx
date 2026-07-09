@@ -19,8 +19,7 @@ const PitchFilterControls: React.FC<PitchFilterControlsProps> = ({
 }) => {
 
   return (
-    <section className={styles.filterControls} aria-label="Pitch filters">
-      <fieldset>
+      <fieldset className={styles.filterControls} aria-label="Pitch filters">
         <legend>Filter Pitches</legend>
 
         <div className={styles.filterRow}>
@@ -135,7 +134,6 @@ const PitchFilterControls: React.FC<PitchFilterControlsProps> = ({
           </button>
         </div>
       </fieldset>
-    </section>
   );
 };
 

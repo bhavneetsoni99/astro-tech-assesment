@@ -14,11 +14,6 @@
   border-radius: 4px;
 }
 
-@media (min-width: 769px) {
-  table {
-    table-layout: fixed;
-  }
-}
 
 .tableHeading {
   display: flex;
@@ -31,6 +26,7 @@
   flex: 1;
   margin: 0;
   margin-bottom: .75rem;
+  font-size: 1.25rem;
 }
 
 .dataInfo {
@@ -41,13 +37,17 @@
 table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 th,
 td {
-  padding: 8px 12px;
+  padding: .65rem .75rem;
   text-align: left;
   border-bottom: 1px solid #ddd;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis
 }
 
 th {
@@ -56,6 +56,15 @@ th {
   position: sticky;
   top: 0;
   z-index: 1;
+}
+.colFlex {
+  width: auto;
+}
+.colSmall {
+  width: 8%;
+}
+.colMedium {
+  width: 12%;
 }
 
 .sortableHeader {
@@ -113,7 +122,7 @@ tbody tr:hover {
 .loadMoreBottom {
   display: none;
   justify-content: center;
-  padding: 1rem;
+  padding: 1rem 0 0;
 }
 
 @media (max-width: 768px) {
@@ -136,14 +145,20 @@ tbody tr:hover {
     overflow: visible;
   }
 
+  .tableHeading {
+    font-size: .85rem;
+    h2 {
+      font-size: 1rem;
+    }
+  }
+
   table {
-    width: auto;
     min-width: 100%;
   }
 
   th,
   td {
-    padding: 6px 8px;
+    padding: .4rem .5rem;
     font-size: 0.85rem;
     white-space: nowrap;
   }
