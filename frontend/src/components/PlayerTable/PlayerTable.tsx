@@ -1,27 +1,30 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import ApiService from "../../services/api";
-import { Player, PlayerFilterOptions, TableRow } from "../../types";
-import {TableComponent} from "../TableComponent";
-import { getAge, useSort } from "../../utils";
+import { Player, TableRow } from "../../types";
+import { TableComponent } from "../TableComponent";
+import { getAge, useSort, useFilterParams } from "../../utils";
+import type { SortDirection } from "../../types";
+
+
+// coloumn name and classname to adjust width
+const PLAYER_COLUMNS = [['Name', 'colFlex'], ['Team', 'colSmall'],
+['Pos', 'colSmall'], ['Bat', 'colSmall'], ['Thw', 'colSmall'],
+['Age', 'colSmall'], ['Ht', 'colSmall'], ['Wt', 'colMedium'],
+['Birth Place', 'colFlex']]
 
 interface PlayerTableProps {
- filters?: PlayerFilterOptions;
+  filters?: Record<string, string>;
 }
 
-const PLAYER_COLUMNS = [['Name', 'colFlex'], ['Team', 'colSmall'],
- ['Pos', 'colSmall'], ['Bat', 'colSmall'], ['Thw', 'colSmall'], 
- ['Age', 'colSmall'], ['Ht', 'colSmall'], ['Wt', 'colMedium'], 
- ['Birth Place', 'colFlex']]
-
-export const PlayerTable: React.FC<PlayerTableProps> = ({
-  filters = {},
-}) => {
+export const PlayerTable: React.FC<PlayerTableProps> = ({ filters: propFilters }) => {
   const navigate = useNavigate();
+  const {selectedFilters: urlFilters} = useFilterParams();
+  const selectedFilters = propFilters ?? urlFilters;
   const [players, setPlayers] = useState<Player[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
-  const {team, position, throws, bats} = filters;
+  const { team, position, throws, bats, columnIndex, direction } = selectedFilters;
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -48,7 +51,7 @@ export const PlayerTable: React.FC<PlayerTableProps> = ({
     ]
   } as TableRow)), [players]);
 
-  const { sortConfig, handleSort, sortData } = useSort();
+  const { handleSort, sortData } = useSort();
   const sortedRows = useMemo(() => sortData(rows), [rows, sortData]);
 
   return (
@@ -64,8 +67,8 @@ export const PlayerTable: React.FC<PlayerTableProps> = ({
           navigate(`/player-details/${rowId}`);
         }
       }}
-      sortColumn={sortConfig.columnIndex}
-      sortDirection={sortConfig.direction}
+      sortColumn={columnIndex !== undefined ? Number(columnIndex) : null}
+      sortDirection={(direction as SortDirection) ?? null}
       onSort={handleSort}
     />
   );

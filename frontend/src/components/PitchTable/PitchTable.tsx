@@ -1,22 +1,25 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import ApiService from "../../services/api";
-import { PitchesResponse, PitchFilterOptions, TableRow } from "../../types";
+import { PitchesResponse, TableRow } from "../../types";
 import { TableComponent } from "../TableComponent";
-import { useSort } from "../../utils";
+import { useSort, useFilterParams } from "../../utils";
+import type { SortDirection } from "../../types";
 
-interface PitchTableProps {
-  filters?: PitchFilterOptions;
-}
 
 const PITCH_COLUMNS = [['Pitcher', 'colFlex'], ['P.Team', 'colFlex'], 
 ['Type', 'colFlex'], ['Spd', 'colSmall'], ['Batter', 'colFlex'],
  ['B.Team', 'colFlex'], ['Res', 'colFlex'], ['Date', 'colFlex']]
 const DEFAULT_LIMIT = 50;
-export const PitchTable: React.FC<PitchTableProps> = ({
-  filters = {},
-}) => {
+
+interface PitchTableProps {
+  filters?: Record<string, string>;
+}
+
+export const PitchTable: React.FC<PitchTableProps> = ({ filters: propFilters }) => {
   const navigate = useNavigate()
+  const {selectedFilters: urlFilters} = useFilterParams();
+  const selectedFilters = propFilters ?? urlFilters;
   const [pitchesResponse, setPitchesResponse] = useState<PitchesResponse>({
     pitches: [],
     total_count: 0,
@@ -25,7 +28,9 @@ export const PitchTable: React.FC<PitchTableProps> = ({
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
-  const { release_speed, pitcher, batter, pitch_name, pitching_team, batting_team } = filters;
+  const { release_speed, pitcher, batter, pitch_name, pitching_team, batting_team,
+     columnIndex, direction
+    } = selectedFilters;
   const { pitches, total_count, next_cursor } = pitchesResponse;
 
   const fetchPitches = useCallback((cursorValue?: number | null) => {
@@ -37,20 +42,20 @@ export const PitchTable: React.FC<PitchTableProps> = ({
       batting_team,
       ...(cursorValue && { next_cursor: cursorValue }),
       ...(release_speed && { release_speed }),
-      ...(pitcher && { pitcher }),
-      ...(batter && { batter })
+      ...(pitcher && { pitcher: Number(pitcher) }),
+      ...(batter && { batter: Number(batter) })
     }
     ApiService.getPitches(queries)
       .then((res) => setPitchesResponse((prev) => {
         if (!cursorValue) { //will be passed only when we call load more manually
-          return res;
-        }
+            return res;
+          }
 
-        return {
-          ...res,
+          return {
+            ...res,
           total_count: prev.total_count, //total count only returned on initial load
-          pitches: [...prev.pitches, ...res.pitches],
-        };
+            pitches: [...prev.pitches, ...res.pitches],
+          };
       }))
       .catch((err) => setError(err.message))
       .finally(() => setIsLoading(false));
@@ -85,7 +90,7 @@ const rows = useMemo(() => pitches.map((pitch) => ({
     ]
   } as TableRow)), [pitches]);
 
-  const { sortConfig, handleSort, sortData } = useSort();
+  const { handleSort, sortData } = useSort();
   const sortedRows = useMemo(() => sortData(rows), [rows, sortData]);
 
   return (
@@ -99,8 +104,8 @@ const rows = useMemo(() => pitches.map((pitch) => ({
       hasMoreData={!!next_cursor}
       onLoadMore={() => fetchPitches(next_cursor)}
       onRowClick={(rowId) => navigate(`/pitch-details/${rowId}`)}
-      sortColumn={sortConfig.columnIndex}
-      sortDirection={sortConfig.direction}
+      sortColumn={columnIndex !== undefined ? Number(columnIndex) : null}
+      sortDirection={(direction as SortDirection) ?? null}
       onSort={handleSort}
     />
   );

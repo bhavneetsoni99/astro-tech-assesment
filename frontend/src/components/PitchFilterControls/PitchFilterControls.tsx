@@ -1,5 +1,5 @@
 import React from "react";
-import { PitchFilterOptions, PlayerInfo } from "../../types";
+import { FilterOptions, PitchFilterOptions, PlayerInfo } from "../../types";
 import styles from "./pitchFilterControls.styles.module.css";
 
 interface PitchFilterControlsProps {
@@ -7,7 +7,7 @@ interface PitchFilterControlsProps {
   availablePlayers: PlayerInfo[];
   availableTeams: string[];
   filters?: PitchFilterOptions;
-  onFilterChange: React.Dispatch<React.SetStateAction<PitchFilterOptions>>
+  onFilterChange: (filters: FilterOptions) => void
 }
 
 const PitchFilterControls: React.FC<PitchFilterControlsProps> = ({
@@ -29,8 +29,7 @@ const PitchFilterControls: React.FC<PitchFilterControlsProps> = ({
               id="pitch-name-filter"
               value={filters.pitch_name || ""}
               onChange={(event) =>
-                onFilterChange((prevFilters: PitchFilterOptions) =>
-                  ({ ...prevFilters, pitch_name: event?.target?.value || '' }))}
+                onFilterChange({ ...filters, pitch_name: event?.target?.value || '' })}
             >
               <option value="">All Pitches</option>
               {availablePitchNames.map((pitchName) => (
@@ -47,10 +46,10 @@ const PitchFilterControls: React.FC<PitchFilterControlsProps> = ({
               id="pitcher-filter"
               value={filters.pitcher || ""}
               onChange={(event) =>
-                onFilterChange((prev: PitchFilterOptions) => ({
-                  ...prev,
+                onFilterChange({
+                  ...filters,
                   pitcher: Number(event.target.value) || undefined
-                }))
+                })
               }
             >
               <option value="">All Pitchers</option>
@@ -67,10 +66,10 @@ const PitchFilterControls: React.FC<PitchFilterControlsProps> = ({
               id="pitching-team-filter"
               value={filters.pitching_team || ""}
               onChange={(event) =>
-                onFilterChange((prev: PitchFilterOptions) => ({
-                  ...prev,
+                onFilterChange({
+                  ...filters,
                   pitching_team: event.target.value || undefined
-                }))
+                })
               }
             >
               <option value="">All Teams</option>
@@ -85,10 +84,10 @@ const PitchFilterControls: React.FC<PitchFilterControlsProps> = ({
               id="batter-filter"
               value={filters.batter || ""}
               onChange={(event) =>
-                onFilterChange((prev: PitchFilterOptions) => ({
-                  ...prev,
+                onFilterChange({
+                  ...filters,
                   batter: Number(event.target.value) || undefined
-                }))
+                })
               }
             >
               <option value="">All Batters</option>
@@ -105,10 +104,10 @@ const PitchFilterControls: React.FC<PitchFilterControlsProps> = ({
               id="batting-team-filter"
               value={filters.batting_team || ""}
               onChange={(event) =>
-                onFilterChange((prev: PitchFilterOptions) => ({
-                  ...prev,
+                onFilterChange({
+                  ...filters,
                   batting_team: event.target.value || undefined
-                }))
+                })
               }
             >
               <option value="">All Teams</option>
@@ -124,8 +123,8 @@ const PitchFilterControls: React.FC<PitchFilterControlsProps> = ({
               id="speed-filter"
               value={filters.release_speed || ""}
               onChange={(event) =>
-                onFilterChange((prevFilters: PitchFilterOptions) =>
-                  ({ ...prevFilters, release_speed: event.target.value }))}
+                onFilterChange(
+                  { ...filters, release_speed: event.target.value })}
             />
           </div>
 

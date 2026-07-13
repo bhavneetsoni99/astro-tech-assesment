@@ -77,3 +77,12 @@ export interface ApiErrorResponse {
   message: string;
   status: number;
 }
+
+export type SortDirection = "asc" | "desc" | null;
+
+export interface SortConfig {
+  columnIndex?: number | null;
+  direction?: SortDirection;
+}
+
+export type FilterOptions = (PlayerFilterOptions | PitchFilterOptions) & SortConfig

@@ -1,29 +1,35 @@
-import { useState, useCallback } from "react";
-import { TableRow } from "../types";
+import { useCallback, useMemo } from "react";
+import { TableRow, SortConfig, SortDirection } from "../types";
+import {useFilterParams}from './useFilterParams'
 
-export type SortDirection = "asc" | "desc" | null;
+export function useSort() {
+  const  { selectedFilters, setFilters } = useFilterParams()
+   const sortConfig = useMemo<SortConfig>(() => {
+    const { columnIndex, direction } = selectedFilters;
+    if (columnIndex !== undefined && direction) {
+      return {
+        columnIndex: Number(columnIndex),
+        direction: direction as SortDirection
+      };
+    }
+    return { columnIndex: null, direction: null };
+  }, [selectedFilters]);
 
-export interface SortConfig {
-  columnIndex: number | null;
-  direction: SortDirection;
-}
 
-export function useSort(initial?: SortConfig) {
-  const [sortConfig, setSortConfig] = useState<SortConfig>(
-    initial ?? { columnIndex: null, direction: null }
-  );
+const handleSort = useCallback((columnIndex: number) => {
+    let nextConfig: SortConfig = { columnIndex: null, direction: null };
 
-  const handleSort = useCallback((columnIndex: number) => {
-    setSortConfig((prev) => {
-      if (prev.columnIndex !== columnIndex) {
-        return { columnIndex, direction: "asc" };
-      }
-      if (prev.direction === "asc") {
-        return { columnIndex, direction: "desc" };
-      }
-      return { columnIndex: null, direction: null };
-    });
-  }, []);
+    if (sortConfig.columnIndex !== columnIndex) {
+      nextConfig = { columnIndex, direction: "asc" };
+    } else if (sortConfig.direction === "asc") {
+      nextConfig = { columnIndex, direction: "desc" };
+    }
+    setFilters((prev)=>({
+      ...prev,
+      columnIndex: nextConfig.columnIndex,
+      direction: nextConfig.direction,
+    }))
+  }, [sortConfig, setFilters]);
 
   const sortData = useCallback(
     (data: TableRow[]): TableRow[] => {
@@ -45,5 +51,5 @@ export function useSort(initial?: SortConfig) {
     [sortConfig]
   );
 
-  return { sortConfig, handleSort, sortData };
+  return { handleSort, sortData, sortConfig };
 }

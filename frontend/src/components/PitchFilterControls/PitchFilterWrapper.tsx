@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from "react";
 import ApiService from "../../services/api";
-import { PitchFilterOptions, PlayerInfo } from "../../types";
+import { PlayerInfo } from "../../types";
 import PitchFilterControls from "./PitchFilterControls";
+import {useFilterParams} from '../../utils'
 
-interface PitchTableWrapperProps {
-  filters?: PitchFilterOptions;
-  onFilterChange: React.Dispatch<React.SetStateAction<PitchFilterOptions>>
-}
 
 interface PitchFilterState {
   availablePlayers?: PlayerInfo[]
@@ -14,11 +11,9 @@ interface PitchFilterState {
   availableTeams?: string[]
 } 
 
-export const PitchFilterWrapper: React.FC<PitchTableWrapperProps> = ({
-  filters = {},
-  onFilterChange
-}) => {
+export const PitchFilterWrapper: React.FC = () => {
   const [filterData, setfilterData] = useState<PitchFilterState>({});
+  const { selectedFilters, setFilters} = useFilterParams();
   
   useEffect(() => {
     Promise.all([
@@ -36,11 +31,11 @@ export const PitchFilterWrapper: React.FC<PitchTableWrapperProps> = ({
 
   return (
     <PitchFilterControls
-      filters={filters}
+      filters={selectedFilters}
       availablePlayers={availablePlayers}
       availablePitchNames={availablePitchNames}
       availableTeams={availableTeams}
-      onFilterChange={onFilterChange}
+      onFilterChange={setFilters}
     />
   );
 }

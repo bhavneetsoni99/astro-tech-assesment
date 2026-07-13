@@ -1,4 +1,5 @@
 import { describe, test, expect, vi } from "vitest";
+import React from "react";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { PitchTable } from "./PitchTable";
@@ -7,6 +8,20 @@ const mockNavigate = vi.fn();
 
 vi.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
+  useSearchParams: () => {
+    const [params, setParams] = React.useState(new URLSearchParams());
+    return [
+      params,
+      (updater: URLSearchParams | ((prev: URLSearchParams) => Record<string, string>)) => {
+        if (typeof updater === 'function') {
+          const result = updater(params);
+          setParams(new URLSearchParams(
+            Object.entries(result).filter(([_, v]) => v != null && v !== '')
+          ));
+        }
+      },
+    ];
+  },
 }));
 
 const mockGet = vi.hoisted(() => vi.fn());

@@ -1,4 +1,5 @@
 import { describe, test, expect, vi } from "vitest";
+import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { Player } from "../../types";
@@ -8,6 +9,20 @@ const mockNavigate = vi.fn();
 
 vi.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
+  useSearchParams: () => {
+    const [params, setParams] = React.useState(new URLSearchParams());
+    return [
+      params,
+      (updater: URLSearchParams | ((prev: URLSearchParams) => Record<string, string>)) => {
+        if (typeof updater === 'function') {
+          const result = updater(params);
+          setParams(new URLSearchParams(
+            Object.entries(result).filter(([_, v]) => v != null && v !== '')
+          ));
+        }
+      },
+    ];
+  },
 }));
 
 const mockGet = vi.hoisted(() => vi.fn());
@@ -23,10 +38,13 @@ vi.mock("axios", () => ({
   },
 }));
 
-vi.mock("../../utils", async () => ({
-  getAge: vi.fn(() => 25),
-  useSort: (await vi.importActual("../../utils")).useSort,
-}));
+vi.mock("../../utils", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../utils")>();
+  return {
+    ...actual,
+    getAge: vi.fn(() => 25),
+  };
+});
 
 const mockPlayers: Player[] = [
   {

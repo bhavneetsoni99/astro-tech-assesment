@@ -1,7 +1,26 @@
 import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
+import React from "react";
 import { renderHook, act } from "@testing-library/react";
 import { getAge } from "./utils";
 import { useSort } from "./useSort";
+
+vi.mock("react-router-dom", () => ({
+  useNavigate: () => vi.fn(),
+  useSearchParams: () => {
+    const [params, setParams] = React.useState(new URLSearchParams());
+    return [
+      params,
+      (updater: URLSearchParams | ((prev: URLSearchParams) => Record<string, string>)) => {
+        if (typeof updater === 'function') {
+          const result = updater(params);
+          setParams(new URLSearchParams(
+            Object.entries(result).filter(([_, v]) => v != null && v !== '')
+          ));
+        }
+      },
+    ];
+  },
+}));
 
 describe("getAge", () => {
   beforeEach(() => {

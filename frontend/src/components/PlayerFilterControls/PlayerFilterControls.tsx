@@ -1,12 +1,12 @@
 import React from "react";
-import { PlayerFilterOptions } from "../../types";
+import { PlayerFilterOptions, FilterOptions } from "../../types";
 import styles from "./playerFilterControls.styles.module.css";
 
 interface PlayerFilterControlsProps {
   availableTeams: string[];
   availablePositions: string[];
   filters?: PlayerFilterOptions;
-  onFilterChange: React.Dispatch<React.SetStateAction<PlayerFilterOptions>>
+  onFilterChange: (filters: FilterOptions) => void
 }
 
 const BATTING_HAND = ['L', 'R', 'S']
@@ -31,8 +31,7 @@ const PlayerFilterControls: React.FC<PlayerFilterControlsProps> = ({
               id="team-filter"
               value={filters.team || ""}
               onChange={(event) =>
-                onFilterChange((prevFilters: PlayerFilterOptions) =>
-                  ({ ...prevFilters, team: event?.target?.value || '' }))}
+                onFilterChange({ ...filters, team: event?.target?.value || '' })}
             >
               <option value="">All Teams</option>
               {availableTeams.map((team) => (
