@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import ApiService from "../../services/api";
 import { Player, TableRow } from "../../types";
