@@ -19,7 +19,7 @@ class Pitch(db.Model):
     batter_details = db.relationship("Player", foreign_keys=[batter], backref="pitches_as_batter")
 
     # Pitch characteristics
-    release_speed = db.Column(db.String, nullable=True)
+    release_speed = db.Column(db.Float, nullable=True)
     release_spin_rate = db.Column(db.String, nullable=True)
     release_pos_x = db.Column(db.String, nullable=True)
     release_pos_z = db.Column(db.String, nullable=True)

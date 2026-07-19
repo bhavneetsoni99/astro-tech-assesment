@@ -1,10 +1,11 @@
-from flask import request, jsonify
+from flask import request, jsonify, Response
 from sqlalchemy import select
 from app import db
 from app.errors import ApiError
 from app.schemas import PlayerSchema
 from app.routes import api_bp
 from app.models import Player
+from app.csv_export import export_players_csv
 
 players_schema = PlayerSchema(many=True)
 player_schema = PlayerSchema()
@@ -13,11 +14,7 @@ VALID_THROWS = {"R", "L"}
 VALID_BATS = {"R", "L", "S"}
 
 
-@api_bp.route("/players", methods=["GET"])
-def get_players():
-    """
-    Get all players or filter by team/position.
-    """
+def _get_filtered_players():
     team_arg = request.args.get("team")
     position_arg = request.args.get("position")
     throws_arg = request.args.get("throws")
@@ -48,8 +45,13 @@ def get_players():
         normalized_bats = bats_arg.strip().lower()
         select_players = select_players.where(Player.bats.ilike(normalized_bats))
 
-    players = db.session.execute(select_players).scalars().all()
+    return db.session.execute(select_players).scalars().all()
 
+
+@api_bp.route("/players", methods=["GET"])
+def get_players():
+    """Get all players or filter by team/position."""
+    players = _get_filtered_players()
     return jsonify(players_schema.dump(players)), 200
 
 @api_bp.route("/players/<int:player_id>", methods=["GET"])
@@ -99,3 +101,14 @@ def get_positions():
     )
     positions = db.session.execute(select_positions).scalars().all()
     return jsonify(positions), 200
+
+
+@api_bp.route("/players/download", methods=["GET"])
+def download_players():
+    """Download filtered players as CSV."""
+    players = _get_filtered_players()
+    return Response(
+        export_players_csv(players),
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment; filename=players.csv"},
+    )

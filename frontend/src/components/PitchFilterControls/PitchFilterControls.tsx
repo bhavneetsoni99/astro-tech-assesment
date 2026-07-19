@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FilterOptions, PitchFilterOptions, PlayerInfo } from "../../types";
 import styles from "./pitchFilterControls.styles.module.css";
 
@@ -17,6 +17,15 @@ const PitchFilterControls: React.FC<PitchFilterControlsProps> = ({
   filters = {},
   onFilterChange,
 }) => {
+  const [speed, setSpeed] = useState(filters.release_speed || '');
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onFilterChange({ ...filters, release_speed: speed})
+    }, 500)
+
+    return () => clearTimeout(timer);
+  }, [speed, filters, onFilterChange]);
 
   return (
       <fieldset className={styles.filterControls} aria-label="Pitch filters">
@@ -121,14 +130,13 @@ const PitchFilterControls: React.FC<PitchFilterControlsProps> = ({
             <input
               type="text"
               id="speed-filter"
-              value={filters.release_speed || ""}
-              onChange={(event) =>
-                onFilterChange(
-                  { ...filters, release_speed: event.target.value })}
+              placeholder="Pitches faster than..."
+              value={speed}
+              onChange={(e) => setSpeed(e.target.value)}
             />
           </div>
 
-          <button type="button" onClick={() => onFilterChange({})} className={styles.clearFilters}>
+          <button type="button" onClick={() => {setSpeed(''); onFilterChange({})}} className={styles.clearFilters}>
             Clear Filters
           </button>
         </div>

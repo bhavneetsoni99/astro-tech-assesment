@@ -1,11 +1,12 @@
-from flask import request, jsonify
-from sqlalchemy import func, select
+from flask import request, jsonify, Response
+from sqlalchemy import Float, cast, func, select
 from sqlalchemy.orm import joinedload, aliased
 from app import db
 from app.errors import ApiError
 from app.routes import api_bp
 from app.models import Player, Pitch
 from app.schemas import PitchSchema
+from app.csv_export import export_pitches_csv
 
 pitches_schema = PitchSchema(many=True)
 
@@ -13,24 +14,13 @@ MAX_LIMIT = 1000
 MIN_LIMIT = 1
 
 
-@api_bp.route("/pitches", methods=["GET"])
-def get_pitches():
-    """
-    Get all pitches or filter by various fields such as player, team, date, etc.
-    """
+def _build_filtered_pitch_query():
     pitcher_arg = request.args.get("pitcher")
     batter_arg = request.args.get("batter")
     pitch_name_arg = request.args.get("pitch_name")
     pitching_team_arg = request.args.get("pitching_team")
     batting_team_arg = request.args.get("batting_team")
-
     release_speed_arg = request.args.get("release_speed")
-
-    limit = request.args.get("limit", default=500, type=int)
-    cursor = request.args.get("next_cursor", default=None, type=int)
-
-    if limit < MIN_LIMIT or limit > MAX_LIMIT:
-        raise ApiError(400, f"Limit must be between {MIN_LIMIT} and {MAX_LIMIT}")
 
     pitcher_int: int | None = None
     if pitcher_arg:
@@ -65,7 +55,9 @@ def get_pitches():
         select_pitches = select_pitches.where(Pitch.batter == batter_int)
 
     if speed_val is not None:
-        select_pitches = select_pitches.where(Pitch.release_speed >= speed_val)
+        select_pitches = select_pitches.where(
+            cast(Pitch.release_speed, Float) >= speed_val
+        )
 
     if pitch_name_arg:
         select_pitches = select_pitches.where(Pitch.pitch_name == pitch_name_arg)
@@ -80,28 +72,42 @@ def get_pitches():
             Pitch.batter_details.of_type(Batter)
         ).where(Batter.team == batting_team_arg)
 
+    return select_pitches.order_by(Pitch.rowid.asc())
+
+
+def _execute_pitch_query(select_pitches):
+    return db.session.scalars(
+        select_pitches.options(
+            joinedload(getattr(Pitch, "pitcher_details")),
+            joinedload(getattr(Pitch, "batter_details")),
+        )
+    ).all()
+
+
+@api_bp.route("/pitches", methods=["GET"])
+def get_pitches():
+    """Get all pitches or filter by various fields such as player, team, date, etc."""
+    limit = request.args.get("limit", default=500, type=int)
+    cursor = request.args.get("next_cursor", default=None, type=int)
+
+    if limit < MIN_LIMIT or limit > MAX_LIMIT:
+        raise ApiError(400, f"Limit must be between {MIN_LIMIT} and {MAX_LIMIT}")
+
+    select_pitches = _build_filtered_pitch_query()
+
     total_count = None
     if cursor is None:
         count_query = select(func.count()).select_from(select_pitches.subquery())
         total_count = db.session.scalar(count_query)
-
-    select_pitches = select_pitches.order_by(Pitch.rowid.asc())
 
     if cursor is not None:
         select_pitches = select_pitches.where(Pitch.rowid > cursor)
         total_count = None
 
     paginated_query = select_pitches.limit(limit)
-
-    pitches = db.session.scalars(
-        paginated_query.options(
-            joinedload(getattr(Pitch, "pitcher_details")),
-            joinedload(getattr(Pitch, "batter_details")),
-        )
-    ).all()
+    pitches = _execute_pitch_query(paginated_query)
 
     next_cursor = pitches[-1].rowid if pitches and len(pitches) == limit else None
-
     result = pitches_schema.dump(pitches)
 
     return jsonify(
@@ -122,3 +128,15 @@ def get_pitch_names():
     )
     pitch_names = db.session.execute(select_pitch_names).scalars().all()
     return jsonify(pitch_names), 200
+
+
+@api_bp.route("/pitches/download", methods=["GET"])
+def download_pitches():
+    """Download filtered pitches as CSV."""
+    select_pitches = _build_filtered_pitch_query()
+    pitches = _execute_pitch_query(select_pitches)
+    return Response(
+        export_pitches_csv(pitches),
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment; filename=pitches.csv"},
+    )

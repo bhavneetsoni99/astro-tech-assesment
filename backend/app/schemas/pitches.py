@@ -16,7 +16,7 @@ class PitchSchema(Schema):
     batter_details = fields.Nested(PlayerSchema, only=["first_name", "last_name", "team"], allow_none=True)
 
     # Pitch characteristics
-    release_speed = fields.String(allow_none=True)
+    release_speed = fields.Float(allow_none=True)
     # release_spin_rate = fields.String(allow_none=True)
     # release_pos_x = fields.String(allow_none=True)
     # release_pos_z = fields.String(allow_none=True)
