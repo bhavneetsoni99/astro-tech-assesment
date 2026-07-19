@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ApiService from "../../services/api";
 import { PitchesResponse, TableRow } from "../../types";
 import { TableComponent } from "../TableComponent";
-import { useSort, useFilterParams } from "../../utils";
+import { useSort, useFilterParams, triggerDownload } from "../../utils";
 import type { SortDirection } from "../../types";
 
 
@@ -93,6 +93,19 @@ const rows = useMemo(() => pitches.map((pitch) => ({
   const { handleSort, sortData } = useSort();
   const sortedRows = useMemo(() => sortData(rows), [rows, sortData]);
 
+  const handleDownloadCSV = useCallback(async () => {
+    try {
+      const blob = await ApiService.downloadPitchesCSV({
+        pitch_name, pitching_team, batting_team, release_speed,
+        pitcher: pitcher ? Number(pitcher) : undefined,
+        batter: batter ? Number(batter) : undefined,
+      });
+      triggerDownload(blob, "pitches.csv");
+    } catch {
+      setError("Failed to download CSV");
+    }
+  }, [pitch_name, pitching_team, batting_team, release_speed, pitcher, batter]);
+
   return (
     <TableComponent
       tableName="pitches"
@@ -107,6 +120,7 @@ const rows = useMemo(() => pitches.map((pitch) => ({
       sortColumn={columnIndex !== undefined ? Number(columnIndex) : null}
       sortDirection={(direction as SortDirection) ?? null}
       onSort={handleSort}
+      handleDownlad={handleDownloadCSV}
     />
   );
 }

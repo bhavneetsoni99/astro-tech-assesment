@@ -273,3 +273,38 @@ class TestPlayersListAPI:
         
         player_ids = {p["player_id"] for p in data}
         assert player_ids == {453286, 506433, 999999}
+
+
+class TestPlayersDownloadAPI:
+    """Test the players CSV download endpoint."""
+
+    def test_download_players_csv_content_type(self, client):
+        """Test that CSV download returns correct content type."""
+        response = client.get("/api/v1/players/download")
+        assert response.status_code == 200
+        assert response.content_type.startswith("text/csv")
+        assert "filename=players.csv" in response.headers.get("Content-Disposition", "")
+
+    def test_download_players_csv_filtered_by_team(self, client):
+        """Test downloading filtered players as CSV."""
+        response = client.get("/api/v1/players/download?team=TOR")
+        lines = response.get_data(as_text=True).strip().split("\n")
+        assert len(lines) == 2  # header + 1 player
+        assert "Maxwell" in lines[1]
+
+
+class TestPitchesDownloadAPI:
+    """Test the pitches CSV download endpoint."""
+
+    def test_download_pitches_csv_content_type(self, client):
+        """Test that CSV download returns correct content type."""
+        response = client.get("/api/v1/pitches/download")
+        assert response.status_code == 200
+        assert response.content_type.startswith("text/csv")
+        assert "filename=pitches.csv" in response.headers.get("Content-Disposition", "")
+
+    def test_download_pitches_csv_filtered_by_pitcher(self, client):
+        """Test downloading filtered pitches as CSV."""
+        response = client.get("/api/v1/pitches/download?pitcher=453286")
+        lines = response.get_data(as_text=True).strip().split("\n")
+        assert len(lines) == 3  # header + 2 pitches

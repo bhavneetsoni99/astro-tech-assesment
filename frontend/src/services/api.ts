@@ -58,6 +58,22 @@ export class ApiService {
     return response.data;
   }
 
+  static async downloadPlayersCSV(filters?: PlayerFilterOptions): Promise<Blob> {
+    const response = await api.get("/players/download", {
+      params: filters,
+      responseType: "blob",
+    });
+    return response.data;
+  }
+
+  static async downloadPitchesCSV(filters?: PitchFilterOptions): Promise<Blob> {
+    const response = await api.get("/pitches/download", {
+      params: filters,
+      responseType: "blob",
+    });
+    return response.data;
+  }
+
   /**
    * Health check endpoint
    */

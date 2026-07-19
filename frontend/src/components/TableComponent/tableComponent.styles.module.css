@@ -161,6 +161,20 @@ tbody tr:hover {
   cursor: pointer;
 }
 
+.downloadButton {
+  margin-left: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  &:hover {
+    transform: translateY(-5px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
 .loadMoreBottom {
   display: none;
   justify-content: center;

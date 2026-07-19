@@ -3,6 +3,7 @@ import { LoadingSpinner } from "../LoadingSpinner";
 import styles from "./tableComponent.styles.module.css";
 import { TableRow } from "../../types";
 import type { SortDirection } from "../../utils";
+import downloadIcon from "../../assets/download.svg";
 
 interface TableProps {
   tableName: 'players' | 'pitches';
@@ -17,6 +18,7 @@ interface TableProps {
   sortColumn?: number | null;
   sortDirection?: SortDirection;
   onSort?: (columnIndex: number) => void;
+  handleDownlad?: () => void;
 }
 
 export const TableComponent: React.FC<TableProps> = memo(({
@@ -32,6 +34,7 @@ export const TableComponent: React.FC<TableProps> = memo(({
   sortColumn = null,
   sortDirection = null,
   onSort,
+  handleDownlad
 }) => {
 
   const hasData = data.length > 0;
@@ -65,6 +68,12 @@ export const TableComponent: React.FC<TableProps> = memo(({
             </button>
           </div>
         )}
+
+        {handleDownlad && 
+          <button className={styles.downloadButton} onClick={handleDownlad}>
+            <img className="download" src={downloadIcon}></img>
+          </button>
+        }
       </div>
       <div className={styles.tableContainer}>
         {isLoading && (<LoadingSpinner />)}

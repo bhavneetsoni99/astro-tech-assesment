@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import ApiService from "../../services/api";
 import { Player, TableRow } from "../../types";
 import { TableComponent } from "../TableComponent";
-import { getAge, useSort, useFilterParams } from "../../utils";
+import { getAge, useSort, useFilterParams, triggerDownload } from "../../utils";
 import type { SortDirection } from "../../types";
 
 
@@ -54,22 +54,34 @@ export const PlayerTable: React.FC<PlayerTableProps> = ({ filters: propFilters }
   const { handleSort, sortData } = useSort();
   const sortedRows = useMemo(() => sortData(rows), [rows, sortData]);
 
+  const handleDownloadCSV = useCallback(async () => {
+    try {
+      const blob = await ApiService.downloadPlayersCSV({team, position, throws, bats});
+      triggerDownload(blob, "players.csv");
+    } catch {
+      setError("Failed to download CSV");
+    }
+  }, [team, position, throws, bats]);
+
+  const handleRowClick = useCallback((rowId: number | string) => {
+    const player = players.find(p => p.player_id === rowId);
+    if (player) {
+      navigate(`/player-details/${rowId}`);
+    }
+  }, [players, navigate]);
+
   return (
-    <TableComponent
-      tableName="players"
-      columns={PLAYER_COLUMNS}
-      data={sortedRows}
-      isLoading={isLoading}
-      error={error}
-      onRowClick={(rowId) => {
-        const player = players.find(p => p.player_id === rowId);
-        if (player) {
-          navigate(`/player-details/${rowId}`);
-        }
-      }}
-      sortColumn={columnIndex !== undefined ? Number(columnIndex) : null}
-      sortDirection={(direction as SortDirection) ?? null}
-      onSort={handleSort}
-    />
+      <TableComponent
+        tableName="players"
+        columns={PLAYER_COLUMNS}
+        data={sortedRows}
+        isLoading={isLoading}
+        error={error}
+        onRowClick={handleRowClick}
+        sortColumn={columnIndex !== undefined ? Number(columnIndex) : null}
+        sortDirection={(direction as SortDirection) ?? null}
+        onSort={handleSort}
+        handleDownlad={handleDownloadCSV}
+      />
   );
 };
