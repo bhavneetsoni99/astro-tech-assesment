@@ -156,3 +156,11 @@ def download_pitches():
         mimetype="text/csv",
         headers={"Content-Disposition": "attachment; filename=pitches.csv"},
     )
+
+@api_bp.route("/pitches/all", methods=["GET"])
+def get_all_pitches():
+    """Get all pitches as CSV."""
+    select_pitches = _build_filtered_pitch_query()
+    pitches = _execute_pitch_query(select_pitches)
+
+    return jsonify(pitches_schema.dump(pitches)), 200

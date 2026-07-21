@@ -58,6 +58,12 @@ export class ApiService {
     return response.data;
   }
 
+  static async getAllPitches(): Promise<Pitch[]>{
+    const response = await api.get("/pitches/all");
+    const pitches: Pitch[] = response.data;
+    return pitches;
+  }
+
   static async getPitch(pitchId: number): Promise<Pitch> {
     const response = await api.get(`/pitches/${pitchId}`);
     return response.data;

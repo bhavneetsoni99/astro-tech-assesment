@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ApiService from "../../services/api";
 import { PitchesResponse, TableRow } from "../../types";
 import { TableComponent } from "../TableComponent";
-import { useSort, useFilterParams, triggerDownload } from "../../utils";
+import { useSort, useFilterParams, triggerDownload, formatDescription } from "../../utils";
 import type { SortDirection } from "../../types";
 
 
@@ -73,8 +73,6 @@ export const PitchTable: React.FC<PitchTableProps> = ({ filters: propFilters }) 
   return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
 };
 
-const formatDescription = (desc: string) =>
-  desc.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
 const rows = useMemo(() => pitches.map((pitch) => ({
     id: pitch.rowid,
