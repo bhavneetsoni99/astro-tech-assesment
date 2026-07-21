@@ -5,7 +5,7 @@ import { PageLayout } from "../PageLayout";
 import chartStyles from "../../styles/charts.module.css";
 
 const PitchVisualizations: React.FC = () => {
-  const [pitches, setPitches] = useState<Pitch[]>([]);
+  const [, setPitches] = useState<Pitch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
