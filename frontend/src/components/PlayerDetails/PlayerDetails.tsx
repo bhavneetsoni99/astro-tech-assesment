@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ApiService from "../../services/api";
 import { Player, Pitch } from "../../types";
-import { CHART_COLORS } from "../../utils";
 import { PageLayout } from "../PageLayout";
 import chartStyles from "../../styles/charts.module.css";
 import pageStyles from "../../styles/page.module.css";
@@ -18,6 +17,7 @@ const PlayerDetails: React.FC = () => {
 
   useEffect(() => {
     if (!playerId) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoading(true);
     setError("");
     const id = Number(playerId);
@@ -81,7 +81,7 @@ const PlayerDetails: React.FC = () => {
       {pitchesAsPitcher.length > 0 && (
         <div className={styles.section}>
           <div className={styles.sectionHeader}>
-            <div className={styles.sectionIcon} style={{ background: CHART_COLORS.navy }}>P</div>
+            <div className={styles.sectionIcon}>P</div>
             <h3 className={styles.sectionTitle}>Pitching — {pitchesAsPitcher.length} pitches</h3>
           </div>
           <div className={chartStyles.chartContainer}>
@@ -104,7 +104,7 @@ const PlayerDetails: React.FC = () => {
       {pitchesAsBatter.length > 0 && (
         <div className={styles.section}>
           <div className={styles.sectionHeader}>
-            <div className={styles.sectionIcon} style={{ background: CHART_COLORS.orange }}>B</div>
+            <div className={styles.sectionIcon}>B</div>
             <h3 className={styles.sectionTitle}>Batting — {pitchesAsBatter.length} pitches faced</h3>
           </div>
           <div className={chartStyles.chartContainer}>
