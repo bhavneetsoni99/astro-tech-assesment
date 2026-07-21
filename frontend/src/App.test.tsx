@@ -13,6 +13,7 @@ vi.mock("react-router-dom", () => ({
     );
   }),
   Outlet: vi.fn(() => <div data-testid="outlet" />),
+  useLocation: vi.fn(() => ({pathname : '/'}))
 }));
 
 describe("App Component", () => {
