@@ -5,11 +5,12 @@ import { PageLayout } from "../PageLayout";
 import chartStyles from "../../styles/charts.module.css";
 
 const PlayerVisualizations: React.FC = () => {
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [, setPlayers] = useState<Player[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoading(true);
     setError("");
     ApiService.getPlayers()

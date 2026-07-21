@@ -15,6 +15,7 @@ const PitchDetails: React.FC = () => {
 
   useEffect(() => {
     if (!pitchId) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoading(true);
     setError("");
     ApiService.getPitch(Number(pitchId))
