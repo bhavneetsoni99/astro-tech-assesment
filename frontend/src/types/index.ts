@@ -35,6 +35,22 @@ export interface Pitch {
   description: string;
   events: string;
   game_date: string;
+  release_spin_rate?: string | null;
+  plate_x?: number | null;
+  plate_z?: number | null;
+  zone?: number | null;
+  balls?: number | null;
+  strikes?: number | null;
+  outs_when_up?: number | null;
+  inning?: number | null;
+  inning_topbot?: string | null;
+  launch_speed?: string | null;
+  launch_angle?: string | null;
+  hit_distance_sc?: string | null;
+  stand?: string | null;
+  p_throws?: string | null;
+  home_team?: string | null;
+  away_team?: string | null;
 }
 
 export interface PlayerFilterOptions {

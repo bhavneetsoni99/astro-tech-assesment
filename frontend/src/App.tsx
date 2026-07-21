@@ -1,6 +1,6 @@
 import React from "react";
 import { ErrorBoundary } from 'react-error-boundary';
-import { NavLink, Outlet, type NavLinkRenderProps } from "react-router-dom";
+import { NavLink, Outlet, type NavLinkRenderProps, useLocation } from "react-router-dom";
 import { ErrorFallback } from "./components/ErrorFallBack";
 import styles from "./styles/styles.module.css";
 import astrosLogo from "./assets/astros.png";
@@ -8,9 +8,15 @@ import astrosLogo from "./assets/astros.png";
 const TABLE_LINKS = [
   { to: "players", label: "Players" },
   { to: "pitches", label: "Pitches" },
+  { to: "player-viz", label: "Player Viz" },
+  { to: "pitch-viz", label: "Pitch Viz" },
 ];
 
 const App: React.FC = () => {
+  const location = useLocation();
+  const tableClass = ["/", "/players", "/pitches"].includes(location.pathname) ? 
+    "tableLayoutHeight" 
+    : "";
   return (
     <div className={styles.App}>
       <header className={styles.header}>
@@ -35,7 +41,7 @@ const App: React.FC = () => {
         ))}
       </nav>
 
-      <main>
+      <main className={styles[tableClass]}>
         <ErrorBoundary
           fallbackRender={(props) => (
             <ErrorFallback error={props.error as Error | null}

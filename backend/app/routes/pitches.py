@@ -9,6 +9,7 @@ from app.schemas import PitchSchema
 from app.csv_export import export_pitches_csv
 
 pitches_schema = PitchSchema(many=True)
+pitch_schema = PitchSchema()
 
 MAX_LIMIT = 1000
 MIN_LIMIT = 1
@@ -118,6 +119,21 @@ def get_pitches():
             "limit": limit,
         }
     ), 200
+
+
+@api_bp.route("/pitches/<int:pitch_id>", methods=["GET"])
+def get_pitch(pitch_id):
+    """Get a single pitch by its rowid."""
+    select_pitch = select(Pitch).where(Pitch.rowid == pitch_id)
+    pitch = db.session.scalar(
+        select_pitch.options(
+            joinedload(getattr(Pitch, "pitcher_details")),
+            joinedload(getattr(Pitch, "batter_details")),
+        )
+    )
+    if pitch is None:
+        raise ApiError(404, f"Pitch with id {pitch_id} not found")
+    return jsonify(pitch_schema.dump(pitch)), 200
 
 
 @api_bp.route("/pitch_names", methods=["GET"])

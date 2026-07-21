@@ -94,7 +94,7 @@
 
 main {
   flex: 1;
-  min-height: 0;
+  min-height: auto;
   max-width: 1200px;
   margin: 0 -1rem;
   padding: 1.25rem 1.5rem;
@@ -102,6 +102,10 @@ main {
   flex-direction: column;
   gap: 1.25rem;
   width: calc(100% + 2rem);
+}
+
+.tableLayoutHeight {
+  min-height: 0;
 }
 
 .footer {

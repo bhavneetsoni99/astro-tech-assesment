@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Player, PlayerFilterOptions, PlayerInfo, PitchFilterOptions, PitchesResponse, type ApiErrorResponse } from "../types";
+import { Player, PlayerFilterOptions, PlayerInfo, Pitch, PitchFilterOptions, PitchesResponse, type ApiErrorResponse } from "../types";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
@@ -55,6 +55,11 @@ export class ApiService {
 
   static async getPitches(filters?: PitchFilterOptions): Promise<PitchesResponse>{
     const response = await api.get("/pitches", { params: filters });
+    return response.data;
+  }
+
+  static async getPitch(pitchId: number): Promise<Pitch> {
+    const response = await api.get(`/pitches/${pitchId}`);
     return response.data;
   }
 
