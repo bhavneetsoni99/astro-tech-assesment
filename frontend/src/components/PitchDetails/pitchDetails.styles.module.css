@@ -82,6 +82,33 @@
   font-weight: 600;
 }
 
+.situationGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 1rem;
+}
+
+.situationCard {
+  text-align: center;
+  padding: 0.75rem;
+  background: #f8f9fb;
+  border-radius: var(--radius-sm);
+}
+
+.situationValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-navy);
+}
+
+.situationLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--color-text-muted);
+  margin-top: 0.15rem;
+}
+
 .matchupCard {
   display: flex;
   align-items: center;

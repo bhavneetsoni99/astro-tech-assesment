@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ApiService from "../../services/api";
 import { Pitch } from "../../types";
+import { formatDescription, CHART_COLORS, OUTCOME_BG_COLORS, OUTCOME_COLORS } from "../../utils";
 import { PageLayout } from "../PageLayout";
+import { SituationDisplay, BattedBallDisplay } from "./charts";
 import chartStyles from "../../styles/charts.module.css";
 import styles from "./pitchDetails.styles.module.css";
-import {formatDescription} from '../../utils';
 
 const PitchDetails: React.FC = () => {
   const { pitchId } = useParams<{ pitchId: string }>();
@@ -29,9 +30,14 @@ const PitchDetails: React.FC = () => {
   if (!pitch) return <PageLayout empty="Pitch not found." />;
 
   const speed = Number(pitch.release_speed);
+  const speedColor = speed >= 95 ? "#d32f2f" : speed >= 90 ? CHART_COLORS.orange : CHART_COLORS.navy;
 
-  const outcomeLabel = (t: string) =>
-    t === "S" ? "Strike" : t === "B" ? "Ball" : t === "X" ? "In-Play" : t;
+  const outcomeLabel = {S: "Strike", B: "Ball", X: "In-Play"} as const;
+  type OutcomeKey = keyof typeof outcomeLabel;
+
+  const outcomeBg = OUTCOME_BG_COLORS[pitch.type as OutcomeKey]  || CHART_COLORS.muted;
+
+  const outcomeColor = OUTCOME_COLORS[pitch.type as OutcomeKey] || CHART_COLORS.text
 
   const eventLabel = formatDescription(pitch.events)|| null;
 
@@ -39,7 +45,7 @@ const PitchDetails: React.FC = () => {
     <PageLayout>
       <div className={styles.pitchCard}>
         <div className={styles.pitchIdentity}>
-          <div className={styles.pitchBadge}>
+          <div className={styles.pitchBadge} style={{ background: speedColor }}>
             <span className={styles.pitchBadgeSpeed}>{speed.toFixed(1)}</span>
             <span className={styles.pitchBadgeLabel}>mph</span>
           </div>
@@ -58,8 +64,8 @@ const PitchDetails: React.FC = () => {
                 <span className={styles.metaLabel}>Inning</span>
                 <span className={styles.metaValue}>{pitch.inning ? `${pitch.inning_topbot || ""} ${pitch.inning}` : "—"}</span>
               </span>
-              <span className={styles.outcomeBadge} >
-                {outcomeLabel(pitch.type)}{eventLabel ? ` · ${eventLabel}` : ""}
+              <span className={styles.outcomeBadge} style={{ background: outcomeBg, color: outcomeColor }}>
+                {outcomeLabel[pitch.type as OutcomeKey] || pitch.type}{eventLabel ? ` · ${eventLabel}` : ""}
               </span>
             </div>
           </div>
@@ -85,16 +91,15 @@ const PitchDetails: React.FC = () => {
       <div className={chartStyles.chartContainer}>
         <div className={chartStyles.chartCard}>
           <h3 className={chartStyles.chartTitle}>Pitch Location</h3>
-
         </div>
         <div className={chartStyles.chartCard}>
           <h3 className={chartStyles.chartTitle}>Game Situation</h3>
-
+          <SituationDisplay pitch={pitch} />
         </div>
         {pitch.launch_speed && Number(pitch.launch_speed) > 0 && (
           <div className={`${chartStyles.chartCard} ${chartStyles.chartCardFull}`}>
             <h3 className={chartStyles.chartTitle}>Batted Ball Data</h3>
-
+            <BattedBallDisplay pitch={pitch} />
           </div>
         )}
       </div>

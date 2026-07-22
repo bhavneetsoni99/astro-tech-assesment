@@ -4,8 +4,7 @@ import { PlayerTable } from "../PlayerTable";
 
 export const PlayersComponent: React.FC = () => {
   return (<>
-            <PlayerFilterWrapper
-            />
+            <PlayerFilterWrapper />
             <PlayerTable />
         </>)
 }  
