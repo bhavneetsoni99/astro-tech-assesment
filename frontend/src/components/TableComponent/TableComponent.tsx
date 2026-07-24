@@ -1,4 +1,5 @@
-import React, { memo } from "react";
+import React, { memo, useRef, useEffect } from "react";
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { LoadingSpinner } from "../LoadingSpinner";
 import styles from "./tableComponent.styles.module.css";
 import { TableRow } from "../../types";
@@ -21,6 +22,8 @@ interface TableProps {
   handleDownlad?: () => void;
 }
 
+const ROW_ESTIMATED_HEIGHT = 48;
+
 export const TableComponent: React.FC<TableProps> = memo(({
   tableName,
   columns,
@@ -30,17 +33,47 @@ export const TableComponent: React.FC<TableProps> = memo(({
   isLoading = false,
   error,
   onRowClick,
-  onLoadMore = () => { },
+  onLoadMore,
   sortColumn = null,
   sortDirection = null,
   onSort,
   handleDownlad
 }) => {
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   const hasData = data.length > 0;
   const noDataMessage = `No ${tableName === 'players' ? 'players' : 'pitches'} found.`;
   const singularHeading = `1 ${tableName === 'players' ? 'Player' : 'Pitch'}`;
   const multipleHeading = `${totalCount} ${tableName === 'players' ? 'Players' : 'Pitches'}`;
+
+  const rowVirtualizer = useVirtualizer({
+    count: data.length,
+    getScrollElement: () => tableContainerRef.current,
+    estimateSize: () => ROW_ESTIMATED_HEIGHT,
+    overscan: 10,
+  });
+
+  const virtualItems = rowVirtualizer.getVirtualItems();
+  const totalSize = rowVirtualizer.getTotalSize();
+  const shouldVirtualize = virtualItems.length > 0 || data.length === 0;
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel || !onLoadMore || !hasMoreData || typeof IntersectionObserver === 'undefined') return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isLoading) {
+          onLoadMore();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMoreData, isLoading, onLoadMore]);
 
   if (error) {
     return (
@@ -58,26 +91,17 @@ export const TableComponent: React.FC<TableProps> = memo(({
         </h2>
         {hasMoreData && (
           <div className={styles.dataInfo}>
-            <span>Showing {data.length} of {totalCount} </span>
-            <button role="button"
-              className={styles.clickable}
-              onClick={onLoadMore}
-              onKeyDown={(e) => e.key === 'Enter' && onLoadMore()}
-            >
-              Load More
-            </button>
+            <span>Showing {data.length} of {totalCount}</span>
           </div>
         )}
-
         {handleDownlad && 
           <button className={styles.downloadButton} onClick={handleDownlad}>
             <img className="download" src={downloadIcon}></img>
           </button>
         }
       </div>
-      <div className={styles.tableContainer}>
-        {isLoading && (<LoadingSpinner />)}
-
+      <div className={styles.tableContainer} ref={tableContainerRef}>
+        {isLoading && <LoadingSpinner />}
         <table aria-labelledby="table-heading">
           <thead>
             <tr>
@@ -109,38 +133,59 @@ export const TableComponent: React.FC<TableProps> = memo(({
           </thead>
           {hasData && (
             <tbody>
-              {data.map((row, index) => (
-                <tr
-                  key={row.id}
-                  data-testid={`row-${row.id}`}
-                  className={`${index % 2 === 0 ? styles.evenRow : styles.oddRow} ${onRowClick ? styles.clickable : ''}`}
-                  {...(onRowClick && {
-                    tabIndex: 0,
-                    onClick: () => onRowClick(row.id),
-                    onKeyDown: (e: React.KeyboardEvent<HTMLTableRowElement>) => e.key === 'Enter' && onRowClick(row.id),
+              {shouldVirtualize ? (
+                <>
+                  {virtualItems[0]?.start > 0 && (
+                    <tr style={{ height: virtualItems[0].start }} />
+                  )}
+                  {virtualItems.map((virtualRow: VirtualItem) => {
+                    const row = data[virtualRow.index];
+                    return (
+                      <tr
+                        key={row.id}
+                        data-index={virtualRow.index}
+                        data-testid={`row-${row.id}`}
+                        className={`${virtualRow.index % 2 === 0 ? styles.evenRow : styles.oddRow} ${onRowClick ? styles.clickable : ''}`}
+                        style={{ height: virtualRow.size }}
+                        {...(onRowClick && {
+                          tabIndex: 0,
+                          onClick: () => onRowClick(row.id),
+                          onKeyDown: (e: React.KeyboardEvent<HTMLTableRowElement>) => e.key === 'Enter' && onRowClick(row.id),
+                        })}
+                      >
+                        {row.cells.map((cell, cellIndex) => (
+                          <td key={columns[cellIndex][0]}>{cell}</td>
+                        ))}
+                      </tr>
+                    );
                   })}
-                >
-                  {row.cells.map((cell, cellIndex) => (
-                    <td key={columns[cellIndex][0]}>{cell}</td>
-                  ))}
-                </tr>
-              ))}
+                  {totalSize - virtualItems[virtualItems.length - 1].end > 0 && (
+                    <tr style={{ height: totalSize - virtualItems[virtualItems.length - 1].end }} />
+                  )}
+                </>
+              ) : (
+                data.map((row, index) => (
+                  <tr
+                    key={row.id}
+                    data-testid={`row-${row.id}`}
+                    className={`${index % 2 === 0 ? styles.evenRow : styles.oddRow} ${onRowClick ? styles.clickable : ''}`}
+                    {...(onRowClick && {
+                      tabIndex: 0,
+                      onClick: () => onRowClick(row.id),
+                      onKeyDown: (e: React.KeyboardEvent<HTMLTableRowElement>) => e.key === 'Enter' && onRowClick(row.id),
+                    })}
+                  >
+                    {row.cells.map((cell, cellIndex) => (
+                      <td key={columns[cellIndex][0]}>{cell}</td>
+                    ))}
+                  </tr>
+                ))
+              )}
             </tbody>
           )}
         </table>
+        {hasMoreData && <div ref={sentinelRef} style={{ height: 1 }} />}
       </div>
-      {hasMoreData && (
-        <div className={styles.loadMoreBottom}>
-          <button role="button"
-            className={styles.clickable}
-            onClick={onLoadMore}
-            onKeyDown={(e) => e.key === 'Enter' && onLoadMore()}
-          >
-            Load More
-          </button>
-        </div>
-      )}
     </div>
   );
 });
-
