@@ -1,5 +1,5 @@
 import React, { memo, useRef, useEffect } from "react";
-import { useVirtualizer } from '@tanstack/react-virtual';
+import { useVirtualizer, type VirtualItem } from '@tanstack/react-virtual';
 import { LoadingSpinner } from "../LoadingSpinner";
 import styles from "./tableComponent.styles.module.css";
 import { TableRow } from "../../types";
