@@ -4,7 +4,7 @@ import ApiService from "../../services/api";
 import { Pitch } from "../../types";
 import { formatDescription, CHART_COLORS, OUTCOME_BG_COLORS, OUTCOME_COLORS } from "../../utils";
 import { PageLayout } from "../PageLayout";
-import { SituationDisplay, BattedBallDisplay } from "./charts";
+import { PitchLocationDetail, SituationDisplay, BattedBallDisplay } from "./charts";
 import chartStyles from "../../styles/charts.module.css";
 import styles from "./pitchDetails.styles.module.css";
 
@@ -91,6 +91,7 @@ const PitchDetails: React.FC = () => {
       <div className={chartStyles.chartContainer}>
         <div className={chartStyles.chartCard}>
           <h3 className={chartStyles.chartTitle}>Pitch Location</h3>
+          <PitchLocationDetail pitch={pitch} />
         </div>
         <div className={chartStyles.chartCard}>
           <h3 className={chartStyles.chartTitle}>Game Situation</h3>

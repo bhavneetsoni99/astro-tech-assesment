@@ -3,6 +3,14 @@ import { useParams } from "react-router-dom";
 import ApiService from "../../services/api";
 import { Player, Pitch } from "../../types";
 import { PageLayout } from "../PageLayout";
+import {
+  PitchTypeDonut,
+  SpeedDotPlot,
+  OutcomeStacked,
+  PitchLocationChart,
+  BattingOutcomeChart,
+  LaunchScatter,
+} from "./charts";
 import chartStyles from "../../styles/charts.module.css";
 import pageStyles from "../../styles/page.module.css";
 import styles from "./playerDetails.styles.module.css";
@@ -87,15 +95,19 @@ const PlayerDetails: React.FC = () => {
           <div className={chartStyles.chartContainer}>
             <div className={chartStyles.chartCard}>
               <h4 className={chartStyles.chartTitle}>Pitch Type Mix</h4>
+              <PitchTypeDonut pitches={pitchesAsPitcher} />
             </div>
             <div className={chartStyles.chartCard}>
               <h4 className={chartStyles.chartTitle}>Speed by Pitch Type</h4>
+              <SpeedDotPlot pitches={pitchesAsPitcher} />
             </div>
             <div className={chartStyles.chartCard}>
               <h4 className={chartStyles.chartTitle}>Outcome by Pitch Type</h4>
+              <OutcomeStacked pitches={pitchesAsPitcher} />
             </div>
             <div className={chartStyles.chartCard}>
               <h4 className={chartStyles.chartTitle}>Pitch Location</h4>
+              <PitchLocationChart pitches={pitchesAsPitcher} />
             </div>
           </div>
         </div>
@@ -110,14 +122,15 @@ const PlayerDetails: React.FC = () => {
           <div className={chartStyles.chartContainer}>
             <div className={chartStyles.chartCard}>
               <h4 className={chartStyles.chartTitle}>Pitches Faced by Type</h4>
-
+              <PitchTypeDonut pitches={pitchesAsBatter} />
             </div>
             <div className={chartStyles.chartCard}>
               <h4 className={chartStyles.chartTitle}>Outcome Distribution</h4>
-
+              <BattingOutcomeChart pitches={pitchesAsBatter} />
             </div>
             <div className={`${chartStyles.chartCard} ${chartStyles.chartCardFull}`}>
               <h4 className={chartStyles.chartTitle}>Launch Speed vs Launch Angle</h4>
+              <LaunchScatter pitches={pitchesAsBatter} />
             </div>
           </div>
         </div>

@@ -29,3 +29,20 @@ export const OUTCOME_BG_COLORS: Record<string, string> = {
 };
 
 export const MARGIN = { top: 24, right: 24, bottom: 48, left: 56 };
+
+import { useEffect, useRef, useState } from "react";
+
+export function useResize(heightRatio = 0.55) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [dim, setDim] = useState({ width: 600, height: 300 });
+  useEffect(() => {
+    if (!ref.current) return;
+    const observer = new ResizeObserver(entries => {
+      const { width } = entries[0].contentRect;
+      setDim({ width, height: Math.min(width * heightRatio, 300) });
+    });
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [heightRatio]);
+  return { containerRef: ref, dimensions: dim };
+}

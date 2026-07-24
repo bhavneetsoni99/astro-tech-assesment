@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import ApiService from "../../services/api";
 import { Player } from "../../types";
 import { PageLayout } from "../PageLayout";
+import { HeightWeightScatter, PositionBarChart, AgeHistogram } from "./charts";
 import chartStyles from "../../styles/charts.module.css";
 
 const PlayerVisualizations: React.FC = () => {
-  const [, setPlayers] = useState<Player[]>([]);
+  const [players, setPlayers] = useState<Player[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -30,12 +31,15 @@ const PlayerVisualizations: React.FC = () => {
       <div className={chartStyles.chartContainer}>
         <div className={chartStyles.chartCard}>
           <h3 className={chartStyles.chartTitle}>Height vs Weight</h3>
+          <HeightWeightScatter players={players} />
         </div>
         <div className={chartStyles.chartCard}>
           <h3 className={chartStyles.chartTitle}>Position Distribution</h3>
+          <PositionBarChart players={players} />
         </div>
         <div className={`${chartStyles.chartCard} ${chartStyles.chartCardFull}`}>
           <h3 className={chartStyles.chartTitle}>Age Distribution</h3>
+          <AgeHistogram players={players} />
         </div>
       </div>
     </PageLayout>
