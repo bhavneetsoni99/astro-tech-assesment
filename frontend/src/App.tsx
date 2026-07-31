@@ -53,7 +53,7 @@ const App: React.FC = () => {
       </main>
 
       <footer className={styles.footer}>
-        <p>Houston Astros - Staff Software Engineer Assessment</p>
+        <p>Houston Astros - Baseball Statistics Dashboard</p>
       </footer>
     </div>
   );

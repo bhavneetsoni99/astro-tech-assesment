@@ -36,9 +36,7 @@ A full-stack web application for exploring and visualizing baseball player stati
 │   │   └── App.test.tsx     # Component tests
 │   ├── package.json
 │   ├── tsconfig.json
-├── QUESIONS.md              # Development practices questions
 ├── .gitignore               # Git ignore patterns
-├── START_HERE.md            # Assessment introduction
 └── README.md                # This file
 ```
 
@@ -72,7 +70,7 @@ A full-stack web application for exploring and visualizing baseball player stati
    ```bash
    # Clone your forked repository
    git clone <your-repo-url>
-   cd tech-assessment-staff-swe
+   cd baseball-stats-dashboard
 
    # Open the project in VS Code
    code .
@@ -110,7 +108,7 @@ A full-stack web application for exploring and visualizing baseball player stati
 
 ```bash
 git clone <your-repo-url>
-cd tech-assessment-staff-swe
+cd baseball-stats-dashboard
 ```
 
 **Backend Setup:**
@@ -167,7 +165,7 @@ npm test # if using the dev container this will be 'bun test' instead
 
 ## Features
 
-Update this README to note the features you completed as a part of your submission. If you would like to explain your thought process or progress further, feel free to include an additional markdown file.
+Update this README to note the features that have been completed. If you would like to explain your thought process or progress further, feel free to include an additional markdown file.
 
 ### Completed
 
@@ -260,9 +258,9 @@ If you finish the core requirements early or want to demonstrate additional skil
 - Additional test coverage
 - Set up logging and monitoring
 
-## Time Management Notes
+## Focus Areas
 
-This assessment is designed to take 2-3 hours. Focus on:
+Focus on:
 
 - Core functionality (upload, store, display)
 - Code quality and structure
@@ -278,7 +276,7 @@ Don't worry about:
 
 ## Questions or Issues
 
-If you encounter any setup issues or have questions about the requirements, please include them in your submission documentation.
+If you encounter any setup issues or have questions about the requirements, please include them in the project documentation.
 
 ### Initial Setup Pain Points
 

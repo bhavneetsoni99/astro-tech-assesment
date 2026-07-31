@@ -32,7 +32,7 @@ describe("App Component", () => {
   test("renders the footer text", () => {
     render(<App />);
     expect(
-      screen.getByText("Houston Astros - Staff Software Engineer Assessment")
+      screen.getByText("Houston Astros - Baseball Statistics Dashboard")
     ).toBeInTheDocument();
   });
 
