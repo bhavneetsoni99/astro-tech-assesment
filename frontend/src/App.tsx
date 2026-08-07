@@ -1,46 +1,59 @@
-import React, { useState } from "react";
-import "./App.css";
-import { Player, PlayerFilterOptions } from "./types";
-import PlayerFilterControls from "./components/PlayerFilterControls";
-import PlayerTable from "./components/PlayerTable";
+import React from "react";
+import { ErrorBoundary } from 'react-error-boundary';
+import { NavLink, Outlet, type NavLinkRenderProps, useLocation } from "react-router-dom";
+import { ErrorFallback } from "./components/ErrorFallBack";
+import styles from "./styles/styles.module.css";
+import astrosLogo from "./assets/astros.png";
+
+const TABLE_LINKS = [
+  { to: "players", label: "Players" },
+  { to: "pitches", label: "Pitches" },
+  { to: "player-viz", label: "Player Viz" },
+  { to: "pitch-viz", label: "Pitch Viz" },
+];
 
 const App: React.FC = () => {
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string>("");
-  const [availableTeams, setAvailableTeams] = useState<string[]>([]);
-  const [availablePositions, setAvailablePositions] = useState<string[]>([]);
-
-  const handleFilterChange = (filters: PlayerFilterOptions) => {};
-
+  const location = useLocation();
+  const tableClass = ["/", "/players", "/pitches"].includes(location.pathname) ? 
+    "tableLayoutHeight" 
+    : "";
   return (
-    <div className="App">
-      <header>
-        <h1>Baseball Player Statistics</h1>
-        <p>Explore player statistics</p>
+    <div className={styles.App}>
+      <header className={styles.header}>
+        <img className={styles.logo} src={astrosLogo} alt="Houston Astros" />
+        <div className={styles.headerContent}>
+          <h1 className={styles.heading}>Baseball Player Statistics</h1>
+          <p className={styles.subHeading}>Explore player statistics</p>
+        </div>
+        <img className={styles.logo} src="https://images.ctfassets.net/iiozhi00a8lc/t117_url_logoastros_url_svg/0f490c816cb2bc29d560315b180e9cf5/t117_url_logo.svg" alt="Houston Astros URL logo"></img>
       </header>
+      <nav className={styles.nav}>
+        {TABLE_LINKS.map((link) => (
+          <NavLink
+            key={link.to}
+            to={link.to}
+            className={({ isActive }: NavLinkRenderProps) =>
+              `${styles.navLink}${isActive ? ` ${styles.active}` : ""}`
+            }
+          >
+            {link.label}
+          </NavLink>
+        ))}
+      </nav>
 
-      <main>
-        {/* TODO: Player Filter controls */}
-        <section className="filter-section">
-          <PlayerFilterControls
-            onFilterChange={handleFilterChange}
-            availableTeams={availableTeams}
-            availablePositions={availablePositions}
-          />
-        </section>
-
-        {/* TODO: Player data table */}
-        <section className="data-section">
-          <PlayerTable players={players} isLoading={isLoading} error={error} />
-        </section>
-
-        {/* TODO: Pitch Filter Controls}
-        {/* TODO: Implement pitches table */}
+      <main className={styles[tableClass]}>
+        <ErrorBoundary
+          fallbackRender={(props) => (
+            <ErrorFallback error={props.error as Error | null}
+              resetErrorBoundary={() => (window.location.href = '/')} />
+          )}
+        >
+          <Outlet />
+        </ErrorBoundary>
       </main>
 
-      <footer>
-        <p>Houston Astros - Staff Software Engineer Assessment</p>
+      <footer className={styles.footer}>
+        <p>Houston Astros - Baseball Statistics Dashboard</p>
       </footer>
     </div>
   );

@@ -1,0 +1,150 @@
+.pitchCard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem 3rem;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: 1.5rem 2rem;
+}
+
+.pitchIdentity {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pitchBadge {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  flex-shrink: 0;
+  line-height: 1.2;
+}
+
+.pitchBadgeSpeed {
+  font-size: 1rem;
+}
+
+.pitchBadgeLabel {
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.pitchName {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-text);
+}
+
+.pitchMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin-top: 0.15rem;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+.metaLabel {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.3px;
+}
+
+.metaValue {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.outcomeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.situationGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 1rem;
+}
+
+.situationCard {
+  text-align: center;
+  padding: 0.75rem;
+  background: #f8f9fb;
+  border-radius: var(--radius-sm);
+}
+
+.situationValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-navy);
+}
+
+.situationLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--color-text-muted);
+  margin-top: 0.15rem;
+}
+
+.matchupCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f8f9fb;
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+
+.matchupPlayer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.matchupName {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.matchupDetail {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.matchupVs {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-orange);
+}
+
+@media (max-width: 768px) {
+  .pitchCard {
+    padding: 1rem;
+  }
+}

@@ -36,9 +36,7 @@ A full-stack web application for exploring and visualizing baseball player stati
 │   │   └── App.test.tsx     # Component tests
 │   ├── package.json
 │   ├── tsconfig.json
-├── QUESIONS.md              # Development practices questions
 ├── .gitignore               # Git ignore patterns
-├── START_HERE.md            # Assessment introduction
 └── README.md                # This file
 ```
 
@@ -72,7 +70,7 @@ A full-stack web application for exploring and visualizing baseball player stati
    ```bash
    # Clone your forked repository
    git clone <your-repo-url>
-   cd tech-assessment-staff-swe
+   cd baseball-stats-dashboard
 
    # Open the project in VS Code
    code .
@@ -110,7 +108,7 @@ A full-stack web application for exploring and visualizing baseball player stati
 
 ```bash
 git clone <your-repo-url>
-cd tech-assessment-staff-swe
+cd baseball-stats-dashboard
 ```
 
 **Backend Setup:**
@@ -167,7 +165,7 @@ npm test # if using the dev container this will be 'bun test' instead
 
 ## Features
 
-Update this README to note the features you completed as a part of your submission. If you would like to explain your thought process or progress further, feel free to include an additional markdown file.
+Update this README to note the features that have been completed. If you would like to explain your thought process or progress further, feel free to include an additional markdown file.
 
 ### Completed
 
@@ -260,9 +258,9 @@ If you finish the core requirements early or want to demonstrate additional skil
 - Additional test coverage
 - Set up logging and monitoring
 
-## Time Management Notes
+## Focus Areas
 
-This assessment is designed to take 2-3 hours. Focus on:
+Focus on:
 
 - Core functionality (upload, store, display)
 - Code quality and structure
@@ -278,4 +276,147 @@ Don't worry about:
 
 ## Questions or Issues
 
-If you encounter any setup issues or have questions about the requirements, please include them in your submission documentation.
+If you encounter any setup issues or have questions about the requirements, please include them in the project documentation.
+
+### Initial Setup Pain Points
+
+Ran into trouble while inital setup of the proeject, `pandas` installatio was failing due to mismatch of the pre-compiled wheels for the Python version (3.14.6) and pandas version specified in the Requirements.txt, had to upgrade the pandas version to latest one (3.0.3) to resolve.
+
+Since we do not have any designs avaiable, I have tried to emulate [ESPNs Player table](https://www.espn.com/mlb/team/roster/_/name/bal/baltimore-orioles) design and style.
+
+### WIP
+
+1. Starting with the BE I Implemented API to return `Players List` with filtering based on `Team` and/or `Position` in `main.py`.
+2. Integrated BE `Player List` Api with FE api service call.
+3. Implemented `Players Table`, Table component has been wrapped into a wrapper component to seperate concerns with Data fetching and business logic
+4. Implemented `player/:id` lookup and `teams` list apis
+5. Implemented `position` list api to fetch all possible position values from DB
+6. Implemented `teams` list api to fetch all possible team values from DB
+7. Implemented `PlayerFilters` component and functionality, playerFilter wrapped into a wrapper component to seperate concerns for Data fetching and business logic
+8. Abstracting `Table Component` into a reusable that can be used with `Players` and `Pitches` table
+9. Added `pitches` endpoint with filtering and cursor base pagination
+10. Added `pitch_names` and `player_names` end points to fetch data for filters
+11. Implemented `pitches`, `pitch_names` and `player_names` apis on the FE
+12. Showing both `Pitch` and `Player` tables in the same page was getting cluttered and would have bad user experience on smaller view ports, Added client-side routing to the frontend so the dashboard can render dedicated player and pitch experiences from a shared shell.
+13. Added React Router, for navigation links and nested routes.
+14. Added dedicated route level components for `players` and `pitches` subroutes
+15. Added `Pich` table with support for filtering and paginization
+16. Implement a dedicated `pitch filtering` controls for pitch type, pitcher, batter, team, and release speed.
+
+### Code Organization
+
+I have tried to colocate test and style files within the component folders. All components live in Component Directories under `src/components/`, utility functions in `src/utils/`
+
+Backend App Tree
+app
+├── config.py
+├── **init**.py
+├── models
+│   ├── **init**.py
+│   ├── pitches.py
+│   └── players.py
+├── routes
+│   ├── health.py
+│   ├── **init**.py
+│   ├── pitches.py
+│   └── players.py 
+└── schemas
+├── **init**.py
+├── pitches.py
+└── players.py
+
+Frontend Tree
+.
+├── App.test.tsx
+├── App.tsx
+├── assets
+│   └── astros.png
+├── components
+│   ├── LoadingSpinner
+│   │   ├── index.ts
+│   │   ├── loadingSpinner.styles.module.css
+│   │   └── LoadingSpinner.tsx
+│   ├── Pitches
+│   │   ├── index.ts
+│   │   └── PitchesComponent.tsx
+│   ├── PitchFilterControls
+│   │   ├── index.ts
+│   │   ├── pitchFilterControls.styles.module.css
+│   │   ├── PitchFilterControls.test.tsx
+│   │   ├── PitchFilterControls.tsx
+│   │   └── PitchFilterWrapper.tsx
+│   ├── PitchTable
+│   │   ├── index.ts
+│   │   ├── pitchTable.styles.module.css
+│   │   ├── PitchTable.test.tsx
+│   │   └── PitchTable.tsx
+│   ├── PlayerFilterControls
+│   │   ├── index.ts
+│   │   ├── playerFilterControls.styles.module.css
+│   │   ├── PlayerFilterControls.test.tsx
+│   │   ├── PlayerFilterControls.tsx
+│   │   └── PlayerFilterWrapper.tsx
+│   ├── Players
+│   │   ├── index.ts
+│   │   └── PlayersComponent.tsx
+│   ├── PlayerTable
+│   │   ├── index.ts
+│   │   ├── playerTable.styles.module.css
+│   │   ├── PlayerTable.test.tsx
+│   │   └── PlayerTable.tsx
+│   └── TableComponent
+│   ├── index.ts
+│   ├── tableComponent.styles.module.css
+│   ├── TableComponent.test.tsx
+│   └── TableComponent.tsx
+├── index.css
+├── index.tsx
+├── services
+│   ├── api.test.ts
+│   └── api.ts
+├── setupTests.ts
+├── styles
+│   ├── filter.styles.module.css
+│   ├── global.css
+│   └── styles.module.css
+├── types
+│   └── index.ts
+├── utils
+│   ├── index.ts
+│   ├── useSort.ts
+│   ├── utils.test.ts
+│   └── utils.ts
+└── vite-env.d.ts
+
+### Testing Approach
+
+Tests were written alongside feature implementation, following the existing Vitest + React Testing Library pattern in the Frontend project and Backend project. I used the product requirements to define minimal viable product test cases and expand from there. Continuing to add unit as I build helps me stay on track and ensures new changes don’t break existing functionality. I believe its more important to test for edge cases than Happy paths. If time permits I will try to add E2E tests lateer on.
+
+#### Unit Tests Added:
+
+1.  Updated Unit tests and added unit test for `healthcheck` and `players` api end points.
+2.  Added unit test for FE api service to test appropriate params are being passed to the BE end points.
+3.  Added unit test for `PlayerTable` component
+4.  Added `player/:id` lookup and `teams` list unit tests
+5.  Added `position` list unit test
+6.  Add unit tests for player filter component
+7.  Added unit test for `TableComponent`
+8.  Added integration tests for `Player Table`
+9.  Added unit tests for `pitches`, `pitch_names` and `players`
+10. Isolated Test Databse from the dev db for proper isolation of the test cases
+11. Added unit test for `pitches`, `pitch_names` and `players` on the UI side
+12. Added unit tests for `App.tsx`
+13. Added unit tests for `PitchTable` component
+14. Added unit tests for `PitchFilterControls`
+
+#### E2E Tests Added:
+
+### Additional Improvements/Proposed Improvements
+
+1. Implement a responsive Dynamic table using `Tanstack library (@tanstack/react-virtual)` Library uses `virtualization` techniques to improve applications performance by rendering only the data that is visible on screen.
+
+2. Use CSS Libraries such as `BootStrap` of `Tailwind` to improve the look and feel of the project.
+
+3. Build out `Player Detail` and `Pitch Detail` pages with more data visualizations
+
+I put more effort on showcasing what I can do instead of what Libraries i can implement.
